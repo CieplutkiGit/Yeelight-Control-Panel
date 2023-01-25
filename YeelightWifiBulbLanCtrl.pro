@@ -20,7 +20,14 @@ HEADERS  += \
     mainwindow.h \
     bulb_t.h
 
+QT += widgets
+
+
 FORMS    += mainwindow.ui
 
 QT += network
 RC_FILE = app.rc
+
+
+
+
