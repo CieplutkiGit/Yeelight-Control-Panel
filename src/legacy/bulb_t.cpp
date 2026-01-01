@@ -11,7 +11,7 @@ bulb_t::bulb_t(void)
     brightness = 100;
 }
 
-bulb_t::bulb_t(string ip, string id, int pt /*= 55443*/)
+bulb_t::bulb_t(std::string ip, std::string id, int pt /*= 55443*/)
 {
     ip_str = ip;
     id_str = id;

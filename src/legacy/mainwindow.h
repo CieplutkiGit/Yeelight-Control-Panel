@@ -5,7 +5,7 @@
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork>
 #include <stdint.h>
-#include <bulb_t.h>
+#include "bulb_t.h"
 #include <vector>
 #include <algorithm>
 
@@ -41,8 +41,8 @@ private:
     QByteArray udp_datagram_recv;
     QTcpSocket tcp_socket;
     uint16_t tcp_port;
-    vector<bulb_t> bulb;
-    vector<bulb_t>::iterator ib;
+    std::vector<bulb_t> bulb;
+    std::vector<bulb_t>::iterator ib;
     QHostAddress mcast_addr;
     QString local_ip;
     QString bulb_ip;

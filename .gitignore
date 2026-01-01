@@ -1,0 +1,8 @@
+/build/
+/build-*/
+/.cache/
+/Testing/
+CMakeUserPresets.json
+*.user
+*.autosave
+

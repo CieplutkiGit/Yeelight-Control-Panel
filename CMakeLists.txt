@@ -1,0 +1,55 @@
+cmake_minimum_required(VERSION 3.21)
+
+project(YeelightControlPanel
+    VERSION 2.0.0
+    LANGUAGES CXX
+)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt6 6.5 REQUIRED COMPONENTS
+    Core
+    Gui
+    Widgets
+    Network
+    Test
+)
+
+add_executable(YeelightControlPanel
+    src/legacy/main.cpp
+    src/legacy/mainwindow.cpp
+    src/legacy/mainwindow.h
+    src/legacy/mainwindow.ui
+    src/legacy/bulb_t.cpp
+    src/legacy/bulb_t.h
+)
+
+target_include_directories(YeelightControlPanel PRIVATE src/legacy)
+target_link_libraries(YeelightControlPanel PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Network
+)
+
+if(MSVC)
+    target_compile_options(YeelightControlPanel PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(YeelightControlPanel PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wconversion
+        -Wshadow
+    )
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
