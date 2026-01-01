@@ -31,6 +31,10 @@ add_library(yeelight_core STATIC
     src/core/protocol/YeelightDiscoveryParser.h
     src/core/network/DiscoveryService.cpp
     src/core/network/DiscoveryService.h
+    src/core/network/YeelightConnection.cpp
+    src/core/network/YeelightConnection.h
+    src/core/protocol/YeelightMessageParser.cpp
+    src/core/protocol/YeelightMessageParser.h
 )
 target_include_directories(yeelight_core PUBLIC src)
 target_link_libraries(yeelight_core PUBLIC Qt6::Core Qt6::Gui Qt6::Network)
