@@ -19,6 +19,18 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Test
 )
 
+add_library(yeelight_core STATIC
+    src/core/model/DeviceCapabilities.h
+    src/core/model/DeviceInfo.h
+    src/core/model/DeviceState.h
+    src/core/model/EffectPreset.h
+    src/core/model/ScheduledAction.h
+    src/core/protocol/YeelightCommand.cpp
+    src/core/protocol/YeelightCommand.h
+)
+target_include_directories(yeelight_core PUBLIC src)
+target_link_libraries(yeelight_core PUBLIC Qt6::Core Qt6::Gui Qt6::Network)
+
 add_executable(YeelightControlPanel
     src/legacy/main.cpp
     src/legacy/mainwindow.cpp
@@ -30,6 +42,7 @@ add_executable(YeelightControlPanel
 
 target_include_directories(YeelightControlPanel PRIVATE src/legacy)
 target_link_libraries(YeelightControlPanel PRIVATE
+    yeelight_core
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
@@ -52,4 +65,3 @@ include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
-
