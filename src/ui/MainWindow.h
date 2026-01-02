@@ -6,6 +6,8 @@
 
 class DashboardPage;
 class ColorPage;
+class EffectsPage;
+class SettingsRepository;
 class DeviceListModel;
 class QLabel;
 class QListView;
@@ -18,7 +20,11 @@ class MainWindow final : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(DeviceManager* manager, QWidget* parent = nullptr);
+    explicit MainWindow(
+        DeviceManager* manager,
+        SettingsRepository* settings,
+        QWidget* parent = nullptr
+    );
 
 signals:
     void themeRequested(const QString& theme);
@@ -50,4 +56,5 @@ private:
     QTabWidget* tabs_;
     DashboardPage* dashboardPage_;
     ColorPage* colorPage_;
+    EffectsPage* effectsPage_;
 };

@@ -40,6 +40,10 @@ add_executable(test_ui_smoke
     ../src/ui/pages/DashboardPage.h
     ../src/ui/pages/ColorPage.cpp
     ../src/ui/pages/ColorPage.h
+    ../src/ui/pages/EffectsPage.cpp
+    ../src/ui/pages/EffectsPage.h
+    ../src/ui/dialogs/EffectEditorDialog.cpp
+    ../src/ui/dialogs/EffectEditorDialog.h
     ../src/ui/widgets/ColorPreviewWidget.cpp
     ../src/ui/widgets/ColorPreviewWidget.h
     ../src/ui/dialogs/AddDeviceDialog.cpp
@@ -56,3 +60,13 @@ add_test(NAME ui_smoke COMMAND test_ui_smoke)
 set_tests_properties(ui_smoke PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
+
+add_executable(test_effects
+    test_effects.cpp
+    ../src/ui/pages/EffectsPage.cpp
+    ../src/ui/pages/EffectsPage.h
+    ../src/ui/dialogs/EffectEditorDialog.cpp
+    ../src/ui/dialogs/EffectEditorDialog.h
+)
+target_link_libraries(test_effects PRIVATE yeelight_core Qt6::Widgets Qt6::Test)
+add_test(NAME effects COMMAND test_effects)

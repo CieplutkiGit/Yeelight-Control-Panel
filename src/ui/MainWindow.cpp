@@ -4,6 +4,7 @@
 #include "models/DeviceListModel.h"
 #include "pages/ColorPage.h"
 #include "pages/DashboardPage.h"
+#include "pages/EffectsPage.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -23,7 +24,11 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-MainWindow::MainWindow(DeviceManager* manager, QWidget* parent)
+MainWindow::MainWindow(
+    DeviceManager* manager,
+    SettingsRepository* settings,
+    QWidget* parent
+)
     : QMainWindow(parent)
     , manager_(manager)
     , deviceModel_(new DeviceListModel(manager, this))
@@ -38,7 +43,8 @@ MainWindow::MainWindow(DeviceManager* manager, QWidget* parent)
     , contentStack_(new QStackedWidget(this))
     , tabs_(new QTabWidget(this))
     , dashboardPage_(new DashboardPage(this))
-    , colorPage_(new ColorPage(this)) {
+    , colorPage_(new ColorPage(this))
+    , effectsPage_(new EffectsPage(settings, this)) {
     setWindowTitle(tr("Yeelight LAN"));
     resize(1180, 760);
     setMinimumSize(900, 600);
@@ -125,10 +131,7 @@ MainWindow::MainWindow(DeviceManager* manager, QWidget* parent)
 
     tabs_->addTab(dashboardPage_, tr("Dashboard"));
     tabs_->addTab(colorPage_, tr("Color"));
-    tabs_->addTab(makeInformationalPage(
-        tr("Effects"),
-        tr("Build and play local Yeelight color flows.")
-    ), tr("Effects"));
+    tabs_->addTab(effectsPage_, tr("Effects"));
     tabs_->addTab(makeInformationalPage(
         tr("Automations"),
         tr("Local schedules run only while Yeelight LAN is open.")
@@ -236,6 +239,7 @@ void MainWindow::updateSelection(DeviceController* controller) {
     selectedDevice_ = controller;
     dashboardPage_->setDevice(selectedDevice_);
     colorPage_->setDevice(selectedDevice_);
+    effectsPage_->setDevice(selectedDevice_);
     const bool selected = selectedDevice_ != nullptr;
     contentStack_->setCurrentIndex(selected ? 1 : 0);
     powerOnButton_->setEnabled(selected);

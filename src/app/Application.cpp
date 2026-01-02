@@ -20,7 +20,7 @@ int Application::run() {
     ).toString();
     applyTheme(theme);
 
-    mainWindow_ = std::make_unique<MainWindow>(&deviceManager_);
+    mainWindow_ = std::make_unique<MainWindow>(&deviceManager_, &settings_);
     mainWindow_->restoreGeometry(
         settings_.value(QStringLiteral("ui/windowGeometry")).toByteArray()
     );
@@ -51,4 +51,3 @@ void Application::applyTheme(const QString& theme) {
         setStyleSheet(QString::fromUtf8(file.readAll()));
     }
 }
-
