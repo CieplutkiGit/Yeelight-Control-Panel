@@ -48,15 +48,21 @@ target_include_directories(yeelight_core PUBLIC src)
 target_link_libraries(yeelight_core PUBLIC Qt6::Core Qt6::Gui Qt6::Network)
 
 add_executable(YeelightControlPanel
-    src/legacy/main.cpp
-    src/legacy/mainwindow.cpp
-    src/legacy/mainwindow.h
-    src/legacy/mainwindow.ui
-    src/legacy/bulb_t.cpp
-    src/legacy/bulb_t.h
+    src/main.cpp
+    src/app/Application.cpp
+    src/app/Application.h
+    src/ui/MainWindow.cpp
+    src/ui/MainWindow.h
+    src/ui/models/DeviceListModel.cpp
+    src/ui/models/DeviceListModel.h
+    src/ui/dialogs/AddDeviceDialog.cpp
+    src/ui/dialogs/AddDeviceDialog.h
+    src/ui/pages/DashboardPage.cpp
+    src/ui/pages/DashboardPage.h
+    resources/resources.qrc
 )
 
-target_include_directories(YeelightControlPanel PRIVATE src/legacy)
+target_include_directories(YeelightControlPanel PRIVATE src)
 target_link_libraries(YeelightControlPanel PRIVATE
     yeelight_core
     Qt6::Core
