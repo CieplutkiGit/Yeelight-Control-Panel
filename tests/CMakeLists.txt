@@ -23,3 +23,7 @@ add_executable(test_connection
 )
 target_link_libraries(test_connection PRIVATE yeelight_core Qt6::Test)
 add_test(NAME connection COMMAND test_connection)
+
+add_executable(test_device_manager test_device_manager.cpp)
+target_link_libraries(test_device_manager PRIVATE yeelight_core Qt6::Test)
+add_test(NAME device_manager COMMAND test_device_manager)
