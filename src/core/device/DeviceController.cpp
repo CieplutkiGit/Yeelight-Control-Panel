@@ -203,6 +203,16 @@ void DeviceController::setDeviceName(const QString& name) {
     sendResult(YeelightCommand::setName(nextRequestId_++, name));
 }
 
+void DeviceController::setTransitionDuration(int durationMs) {
+    if (durationMs < 30 || durationMs > 5000) {
+        emit commandError(QStringLiteral(
+            "Transition duration must be between 30 and 5000 ms."
+        ));
+        return;
+    }
+    transitionDurationMs_ = durationMs;
+}
+
 void DeviceController::sendRaw(const QString& method, const QJsonArray& parameters) {
     if (!requireCapability(method)) {
         return;
@@ -284,4 +294,3 @@ void DeviceController::applyProperties(const QVariantMap& properties) {
     state_.lastSeen = QDateTime::currentDateTimeUtc();
     emit stateChanged(state_);
 }
-

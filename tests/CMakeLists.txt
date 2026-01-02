@@ -31,3 +31,28 @@ add_test(NAME device_manager COMMAND test_device_manager)
 add_executable(test_settings_repository test_settings_repository.cpp)
 target_link_libraries(test_settings_repository PRIVATE yeelight_core Qt6::Test)
 add_test(NAME settings_repository COMMAND test_settings_repository)
+
+add_executable(test_ui_smoke
+    test_ui_smoke.cpp
+    ../src/ui/MainWindow.cpp
+    ../src/ui/MainWindow.h
+    ../src/ui/pages/DashboardPage.cpp
+    ../src/ui/pages/DashboardPage.h
+    ../src/ui/pages/ColorPage.cpp
+    ../src/ui/pages/ColorPage.h
+    ../src/ui/widgets/ColorPreviewWidget.cpp
+    ../src/ui/widgets/ColorPreviewWidget.h
+    ../src/ui/dialogs/AddDeviceDialog.cpp
+    ../src/ui/dialogs/AddDeviceDialog.h
+    ../src/ui/models/DeviceListModel.cpp
+    ../src/ui/models/DeviceListModel.h
+)
+target_link_libraries(test_ui_smoke PRIVATE
+    yeelight_core
+    Qt6::Widgets
+    Qt6::Test
+)
+add_test(NAME ui_smoke COMMAND test_ui_smoke)
+set_tests_properties(ui_smoke PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)

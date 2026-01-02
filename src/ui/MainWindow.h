@@ -5,6 +5,7 @@
 #include <QMainWindow>
 
 class DashboardPage;
+class ColorPage;
 class DeviceListModel;
 class QLabel;
 class QListView;
@@ -48,5 +49,5 @@ private:
     QStackedWidget* contentStack_;
     QTabWidget* tabs_;
     DashboardPage* dashboardPage_;
+    ColorPage* colorPage_;
 };
-

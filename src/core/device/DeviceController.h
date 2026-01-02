@@ -38,6 +38,7 @@ public:
     void startEffect(const EffectPreset& preset);
     void stopEffect();
     void setDeviceName(const QString& name);
+    void setTransitionDuration(int durationMs);
     void sendRaw(const QString& method, const QJsonArray& parameters);
 
 signals:
@@ -61,4 +62,3 @@ private:
     int nextRequestId_ = 1;
     int transitionDurationMs_ = 300;
 };
-

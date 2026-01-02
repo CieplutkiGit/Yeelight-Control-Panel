@@ -59,6 +59,10 @@ add_executable(YeelightControlPanel
     src/ui/dialogs/AddDeviceDialog.h
     src/ui/pages/DashboardPage.cpp
     src/ui/pages/DashboardPage.h
+    src/ui/pages/ColorPage.cpp
+    src/ui/pages/ColorPage.h
+    src/ui/widgets/ColorPreviewWidget.cpp
+    src/ui/widgets/ColorPreviewWidget.h
     resources/resources.qrc
 )
 

@@ -2,6 +2,7 @@
 
 #include "dialogs/AddDeviceDialog.h"
 #include "models/DeviceListModel.h"
+#include "pages/ColorPage.h"
 #include "pages/DashboardPage.h"
 
 #include <QAction>
@@ -36,7 +37,8 @@ MainWindow::MainWindow(DeviceManager* manager, QWidget* parent)
     , powerOffButton_(new QPushButton(tr("Off"), this))
     , contentStack_(new QStackedWidget(this))
     , tabs_(new QTabWidget(this))
-    , dashboardPage_(new DashboardPage(this)) {
+    , dashboardPage_(new DashboardPage(this))
+    , colorPage_(new ColorPage(this)) {
     setWindowTitle(tr("Yeelight LAN"));
     resize(1180, 760);
     setMinimumSize(900, 600);
@@ -122,10 +124,7 @@ MainWindow::MainWindow(DeviceManager* manager, QWidget* parent)
     emptyLayout->addStretch();
 
     tabs_->addTab(dashboardPage_, tr("Dashboard"));
-    tabs_->addTab(makeInformationalPage(
-        tr("Color"),
-        tr("Choose RGB, HSV, brightness, and white temperature.")
-    ), tr("Color"));
+    tabs_->addTab(colorPage_, tr("Color"));
     tabs_->addTab(makeInformationalPage(
         tr("Effects"),
         tr("Build and play local Yeelight color flows.")
@@ -236,6 +235,7 @@ void MainWindow::updateSelection(DeviceController* controller) {
     }
     selectedDevice_ = controller;
     dashboardPage_->setDevice(selectedDevice_);
+    colorPage_->setDevice(selectedDevice_);
     const bool selected = selectedDevice_ != nullptr;
     contentStack_->setCurrentIndex(selected ? 1 : 0);
     powerOnButton_->setEnabled(selected);
