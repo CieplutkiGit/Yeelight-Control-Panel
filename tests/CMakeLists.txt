@@ -27,3 +27,7 @@ add_test(NAME connection COMMAND test_connection)
 add_executable(test_device_manager test_device_manager.cpp)
 target_link_libraries(test_device_manager PRIVATE yeelight_core Qt6::Test)
 add_test(NAME device_manager COMMAND test_device_manager)
+
+add_executable(test_settings_repository test_settings_repository.cpp)
+target_link_libraries(test_settings_repository PRIVATE yeelight_core Qt6::Test)
+add_test(NAME settings_repository COMMAND test_settings_repository)

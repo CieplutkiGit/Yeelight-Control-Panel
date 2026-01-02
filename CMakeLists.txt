@@ -39,6 +39,10 @@ add_library(yeelight_core STATIC
     src/core/device/DeviceController.h
     src/core/device/DeviceManager.cpp
     src/core/device/DeviceManager.h
+    src/core/persistence/SettingsRepository.cpp
+    src/core/persistence/SettingsRepository.h
+    src/core/logging/AppLogger.cpp
+    src/core/logging/AppLogger.h
 )
 target_include_directories(yeelight_core PUBLIC src)
 target_link_libraries(yeelight_core PUBLIC Qt6::Core Qt6::Gui Qt6::Network)
