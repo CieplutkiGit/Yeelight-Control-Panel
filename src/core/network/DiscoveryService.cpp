@@ -82,7 +82,7 @@ void DiscoveryService::broadcast() {
         MulticastAddress,
         MulticastPort
     );
-    if (written != DiscoveryRequest.size()) {
+    if (written != static_cast<qint64>(DiscoveryRequest.size())) {
         emit discoveryError(QStringLiteral("Unable to send a discovery broadcast."));
     }
 }
@@ -98,4 +98,3 @@ void DiscoveryService::readPendingDatagrams() {
         }
     }
 }
-

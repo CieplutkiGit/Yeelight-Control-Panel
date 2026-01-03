@@ -10,12 +10,17 @@ constexpr qsizetype MaximumEntries = 2000;
 constexpr qint64 MaximumLogFileBytes = 1024 * 1024;
 
 QString formatEntry(const AppLogger::Entry& entry) {
+    QString severity;
+    switch (entry.severity) {
+    case AppLogger::Severity::Debug: severity = QStringLiteral("Debug"); break;
+    case AppLogger::Severity::Info: severity = QStringLiteral("Info"); break;
+    case AppLogger::Severity::Warning: severity = QStringLiteral("Warning"); break;
+    case AppLogger::Severity::Error: severity = QStringLiteral("Error"); break;
+    }
     return QStringLiteral("%1 [%2] [%3] %4%5")
         .arg(
             entry.timestamp.toString(Qt::ISODateWithMs),
-            AppLogger::staticMetaObject.enumerator(
-                AppLogger::staticMetaObject.indexOfEnumerator("Severity")
-            ).valueToKey(static_cast<int>(entry.severity)),
+            severity,
             entry.category,
             entry.device.isEmpty()
                 ? QString()
@@ -39,7 +44,9 @@ int AppLogger::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant AppLogger::data(const QModelIndex& index, int role) const {
-    if (!index.isValid() || index.row() < 0 || index.row() >= entries_.size()) {
+    if (!index.isValid()
+        || index.row() < 0
+        || index.row() >= static_cast<int>(entries_.size())) {
         return {};
     }
     const Entry& entry = entries_.at(index.row());
@@ -150,14 +157,3 @@ void AppLogger::appendToFile(const Entry& entry) {
     stream << formatEntry(entry) << '\n';
     stream.flush();
 }
-
-QString AppLogger::severityName(Severity severity) {
-    switch (severity) {
-    case Severity::Debug: return QStringLiteral("Debug");
-    case Severity::Info: return QStringLiteral("Info");
-    case Severity::Warning: return QStringLiteral("Warning");
-    case Severity::Error: return QStringLiteral("Error");
-    }
-    return QStringLiteral("Unknown");
-}
-

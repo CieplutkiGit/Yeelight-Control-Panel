@@ -10,6 +10,7 @@ class QLabel;
 class QLineEdit;
 class QSpinBox;
 class QTableWidget;
+class EffectTimelineWidget;
 
 class EffectEditorDialog final : public QDialog {
     Q_OBJECT
@@ -34,8 +35,8 @@ private:
     QSpinBox* repeatSpin_;
     QComboBox* finishCombo_;
     QTableWidget* stepTable_;
+    EffectTimelineWidget* timeline_;
     QLabel* errorLabel_;
     QLabel* expressionLabel_;
     QDialogButtonBox* buttons_;
 };
-

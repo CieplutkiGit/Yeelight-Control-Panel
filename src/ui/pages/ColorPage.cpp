@@ -22,8 +22,9 @@ QColor colorFromRgbInteger(int rgb) {
 }
 }
 
-ColorPage::ColorPage(QWidget* parent)
+ColorPage::ColorPage(SettingsRepository* settings, QWidget* parent)
     : QWidget(parent)
+    , settings_(settings)
     , preview_(new ColorPreviewWidget(this))
     , hexEdit_(new QLineEdit(this))
     , brightnessSlider_(new QSlider(Qt::Horizontal, this))
@@ -46,7 +47,14 @@ ColorPage::ColorPage(QWidget* parent)
     durationSpin_->setObjectName(QStringLiteral("transitionDurationSpin"));
     durationSpin_->setRange(30, 5000);
     durationSpin_->setSuffix(tr(" ms"));
-    durationSpin_->setValue(300);
+    durationSpin_->setValue(
+        settings_ == nullptr
+            ? 300
+            : settings_->value(
+                QStringLiteral("controls/transitionDuration"),
+                300
+            ).toInt()
+    );
     throttleTimer_->setSingleShot(true);
     throttleTimer_->setInterval(100);
 
@@ -118,6 +126,9 @@ ColorPage::ColorPage(QWidget* parent)
         connect(slider, &QSlider::sliderReleased, this, &ColorPage::sendPending);
     }
     connect(durationSpin_, &QSpinBox::valueChanged, this, [this](int value) {
+        if (settings_ != nullptr) {
+            settings_->setValue(QStringLiteral("controls/transitionDuration"), value);
+        }
         if (device_ != nullptr) {
             device_->setTransitionDuration(value);
         }

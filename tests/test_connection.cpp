@@ -20,11 +20,15 @@ void ConnectionTest::sendsQueuedCommandAfterConnecting() {
     device.ipAddress = QStringLiteral("127.0.0.1");
     device.port = server.port();
     YeelightConnection connection(device);
-    QSignalSpy received(&server, &MockYeelightServer::commandReceived);
     connection.send(YeelightCommand::toggle(1).command);
-    QVERIFY(received.wait(1000));
-    QVERIFY(server.received().contains("\"method\":\"toggle\""));
-    QVERIFY(server.received().contains("\"method\":\"get_prop\""));
+    QTRY_VERIFY_WITH_TIMEOUT(
+        server.received().contains("\"method\":\"toggle\""),
+        1000
+    );
+    QTRY_VERIFY_WITH_TIMEOUT(
+        server.received().contains("\"method\":\"get_prop\""),
+        1000
+    );
 }
 
 void ConnectionTest::coalescesContinuousControls() {
@@ -40,4 +44,3 @@ void ConnectionTest::coalescesContinuousControls() {
 
 QTEST_MAIN(ConnectionTest)
 #include "test_connection.moc"
-

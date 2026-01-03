@@ -5,6 +5,12 @@ project(YeelightControlPanel
     LANGUAGES CXX
 )
 
+option(
+    YEELIGHT_WARNINGS_AS_ERRORS
+    "Treat compiler warnings as errors"
+    OFF
+)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -79,6 +85,12 @@ add_executable(YeelightControlPanel
     src/ui/widgets/ColorPreviewWidget.h
     src/ui/widgets/SegmentPreviewWidget.cpp
     src/ui/widgets/SegmentPreviewWidget.h
+    src/ui/widgets/ConnectionBadge.cpp
+    src/ui/widgets/ConnectionBadge.h
+    src/ui/widgets/DeviceListDelegate.cpp
+    src/ui/widgets/DeviceListDelegate.h
+    src/ui/widgets/EffectTimelineWidget.cpp
+    src/ui/widgets/EffectTimelineWidget.h
     resources/resources.qrc
 )
 
@@ -93,14 +105,25 @@ target_link_libraries(YeelightControlPanel PRIVATE
 
 if(MSVC)
     target_compile_options(YeelightControlPanel PRIVATE /W4 /permissive-)
+    target_compile_options(yeelight_core PRIVATE /W4 /permissive-)
+    if(YEELIGHT_WARNINGS_AS_ERRORS)
+        target_compile_options(YeelightControlPanel PRIVATE /WX)
+        target_compile_options(yeelight_core PRIVATE /WX)
+    endif()
 else()
-    target_compile_options(YeelightControlPanel PRIVATE
+    set(YEELIGHT_WARNING_OPTIONS
         -Wall
         -Wextra
         -Wpedantic
         -Wconversion
         -Wshadow
     )
+    target_compile_options(YeelightControlPanel PRIVATE ${YEELIGHT_WARNING_OPTIONS})
+    target_compile_options(yeelight_core PRIVATE ${YEELIGHT_WARNING_OPTIONS})
+    if(YEELIGHT_WARNINGS_AS_ERRORS)
+        target_compile_options(YeelightControlPanel PRIVATE -Werror)
+        target_compile_options(yeelight_core PRIVATE -Werror)
+    endif()
 endif()
 
 include(CTest)

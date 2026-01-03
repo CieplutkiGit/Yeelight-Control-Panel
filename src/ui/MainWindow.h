@@ -6,6 +6,7 @@
 
 class DashboardPage;
 class ColorPage;
+class ConnectionBadge;
 class EffectsPage;
 class AutomationsPage;
 class DevicePage;
@@ -19,6 +20,7 @@ class QPushButton;
 class QSortFilterProxyModel;
 class QStackedWidget;
 class QTabWidget;
+class QSplitter;
 
 class MainWindow final : public QMainWindow {
     Q_OBJECT
@@ -46,6 +48,7 @@ private:
     void showAbout();
 
     DeviceManager* manager_;
+    SettingsRepository* settings_;
     DeviceController* selectedDevice_ = nullptr;
     DeviceListModel* deviceModel_;
     QSortFilterProxyModel* proxyModel_;
@@ -53,11 +56,13 @@ private:
     QLabel* statusLabel_;
     QLabel* selectedNameLabel_;
     QLabel* selectedDetailsLabel_;
-    QLabel* connectionBadge_;
+    ConnectionBadge* connectionBadge_;
     QPushButton* powerOnButton_;
     QPushButton* powerOffButton_;
+    QPushButton* favoriteButton_;
     QStackedWidget* contentStack_;
     QTabWidget* tabs_;
+    QSplitter* splitter_;
     DashboardPage* dashboardPage_;
     ColorPage* colorPage_;
     EffectsPage* effectsPage_;

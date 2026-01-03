@@ -29,6 +29,9 @@ QTabBar::tab { min-height: 36px; padding: 0 12px; }
     background: #e4f5eb;
     color: #17653a;
 }
+#connectionBadge[online="false"] {
+    background: #eceff4;
+    color: #5f6878;
+}
 #emptyStateTitle, #selectedDeviceName { font-size: 20px; font-weight: 600; }
 #validationErrorLabel { color: #a31d2d; }
-

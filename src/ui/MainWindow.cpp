@@ -8,6 +8,8 @@
 #include "pages/AutomationsPage.h"
 #include "pages/DevicePage.h"
 #include "pages/LogsPage.h"
+#include "widgets/ConnectionBadge.h"
+#include "widgets/DeviceListDelegate.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -36,19 +38,22 @@ MainWindow::MainWindow(
 )
     : QMainWindow(parent)
     , manager_(manager)
-    , deviceModel_(new DeviceListModel(manager, this))
+    , settings_(settings)
+    , deviceModel_(new DeviceListModel(manager, settings, this))
     , proxyModel_(new QSortFilterProxyModel(this))
     , deviceListView_(new QListView(this))
     , statusLabel_(new QLabel(tr("No LAN devices found"), this))
     , selectedNameLabel_(new QLabel(tr("No device selected"), this))
     , selectedDetailsLabel_(new QLabel(this))
-    , connectionBadge_(new QLabel(tr("Offline"), this))
+    , connectionBadge_(new ConnectionBadge(this))
     , powerOnButton_(new QPushButton(tr("On"), this))
     , powerOffButton_(new QPushButton(tr("Off"), this))
+    , favoriteButton_(new QPushButton(tr("Favorite"), this))
     , contentStack_(new QStackedWidget(this))
     , tabs_(new QTabWidget(this))
+    , splitter_(new QSplitter(Qt::Horizontal, this))
     , dashboardPage_(new DashboardPage(this))
-    , colorPage_(new ColorPage(this))
+    , colorPage_(new ColorPage(settings, this))
     , effectsPage_(new EffectsPage(settings, this))
     , automationsPage_(new AutomationsPage(automations, manager, this))
     , devicePage_(new DevicePage(manager, this))
@@ -60,10 +65,9 @@ MainWindow::MainWindow(
     auto* central = new QWidget(this);
     auto* outerLayout = new QHBoxLayout(central);
     outerLayout->setContentsMargins(0, 0, 0, 0);
-    auto* splitter = new QSplitter(Qt::Horizontal, central);
-    splitter->setChildrenCollapsible(false);
+    splitter_->setChildrenCollapsible(false);
 
-    auto* sidebar = new QWidget(splitter);
+    auto* sidebar = new QWidget(splitter_);
     sidebar->setMinimumWidth(240);
     sidebar->setMaximumWidth(360);
     auto* sidebarLayout = new QVBoxLayout(sidebar);
@@ -76,6 +80,7 @@ MainWindow::MainWindow(
     search->setPlaceholderText(tr("Search devices"));
     deviceListView_->setObjectName(QStringLiteral("deviceListView"));
     deviceListView_->setUniformItemSizes(true);
+    deviceListView_->setItemDelegate(new DeviceListDelegate(deviceListView_));
     auto* discoverButton = new QPushButton(tr("Discover"), sidebar);
     discoverButton->setObjectName(QStringLiteral("discoverButton"));
     auto* addButton = new QPushButton(tr("Add by IP"), sidebar);
@@ -95,18 +100,19 @@ MainWindow::MainWindow(
     proxyModel_->setFilterRole(Qt::DisplayRole);
     deviceListView_->setModel(proxyModel_);
 
-    auto* mainContent = new QWidget(splitter);
+    auto* mainContent = new QWidget(splitter_);
     auto* mainLayout = new QVBoxLayout(mainContent);
     auto* header = new QWidget(mainContent);
     auto* headerLayout = new QHBoxLayout(header);
     auto* identityLayout = new QVBoxLayout;
     selectedNameLabel_->setObjectName(QStringLiteral("selectedDeviceName"));
     selectedDetailsLabel_->setObjectName(QStringLiteral("selectedDeviceDetails"));
-    connectionBadge_->setObjectName(QStringLiteral("connectionBadge"));
     identityLayout->addWidget(selectedNameLabel_);
     identityLayout->addWidget(selectedDetailsLabel_);
     headerLayout->addLayout(identityLayout, 1);
     headerLayout->addWidget(connectionBadge_);
+    favoriteButton_->setCheckable(true);
+    headerLayout->addWidget(favoriteButton_);
     auto* reconnectButton = new QPushButton(tr("Reconnect"), header);
     headerLayout->addWidget(reconnectButton);
     headerLayout->addWidget(powerOnButton_);
@@ -147,10 +153,15 @@ MainWindow::MainWindow(
     contentStack_->addWidget(tabs_);
     mainLayout->addWidget(contentStack_, 1);
 
-    splitter->addWidget(sidebar);
-    splitter->addWidget(mainContent);
-    splitter->setSizes({280, 900});
-    outerLayout->addWidget(splitter);
+    splitter_->addWidget(sidebar);
+    splitter_->addWidget(mainContent);
+    splitter_->setSizes({280, 900});
+    if (settings_ != nullptr) {
+        splitter_->restoreState(
+            settings_->value(QStringLiteral("ui/splitterState")).toByteArray()
+        );
+    }
+    outerLayout->addWidget(splitter_);
     setCentralWidget(central);
 
     auto* viewMenu = menuBar()->addMenu(tr("&View"));
@@ -204,6 +215,21 @@ MainWindow::MainWindow(
             selectedDevice_->setPower(false);
         }
     });
+    connect(favoriteButton_, &QPushButton::clicked, this, [this](bool favorite) {
+        if (selectedDevice_ == nullptr || settings_ == nullptr) {
+            return;
+        }
+        QStringList favorites = settings_->value(
+            QStringLiteral("devices/favorites")
+        ).toStringList();
+        const QString id = selectedDevice_->info().stableId();
+        favorites.removeAll(id);
+        if (favorite) {
+            favorites.append(id);
+        }
+        settings_->setValue(QStringLiteral("devices/favorites"), favorites);
+        deviceModel_->refreshAll();
+    });
     connect(manager_, &DeviceManager::deviceAdded, this,
         [this](DeviceController*) { updateStatusText(); });
     connect(manager_, &DeviceManager::deviceRemoved, this,
@@ -217,9 +243,25 @@ MainWindow::MainWindow(
 
     updateSelection(nullptr);
     updateStatusText();
+    if (settings_ != nullptr) {
+        const QString selectedId = settings_->value(
+            QStringLiteral("ui/lastSelectedDevice")
+        ).toString();
+        for (int row = 0; row < deviceModel_->rowCount(); ++row) {
+            const QModelIndex sourceIndex = deviceModel_->index(row);
+            if (sourceIndex.data(DeviceListModel::StableIdRole).toString() == selectedId) {
+                deviceListView_->setCurrentIndex(proxyModel_->mapFromSource(sourceIndex));
+                break;
+            }
+        }
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    if (settings_ != nullptr) {
+        settings_->setValue(QStringLiteral("ui/splitterState"), splitter_->saveState());
+        settings_->sync();
+    }
     emit windowClosing(saveGeometry());
     QMainWindow::closeEvent(event);
 }
@@ -234,6 +276,12 @@ void MainWindow::updateSelection(DeviceController* controller) {
         disconnect(selectedDevice_, nullptr, this, nullptr);
     }
     selectedDevice_ = controller;
+    if (selectedDevice_ != nullptr && settings_ != nullptr) {
+        settings_->setValue(
+            QStringLiteral("ui/lastSelectedDevice"),
+            selectedDevice_->info().stableId()
+        );
+    }
     dashboardPage_->setDevice(selectedDevice_);
     colorPage_->setDevice(selectedDevice_);
     effectsPage_->setDevice(selectedDevice_);
@@ -243,10 +291,12 @@ void MainWindow::updateSelection(DeviceController* controller) {
     contentStack_->setCurrentIndex(selected ? 1 : 0);
     powerOnButton_->setEnabled(selected);
     powerOffButton_->setEnabled(selected);
+    favoriteButton_->setEnabled(selected && settings_ != nullptr);
     if (!selected) {
         selectedNameLabel_->setText(tr("No device selected"));
         selectedDetailsLabel_->clear();
-        connectionBadge_->setText(tr("Offline"));
+        connectionBadge_->setOnline(false);
+        favoriteButton_->setChecked(false);
         return;
     }
 
@@ -259,7 +309,12 @@ void MainWindow::updateSelection(DeviceController* controller) {
         selectedDetailsLabel_->setText(
             QStringLiteral("%1 · %2").arg(info.model, info.ipAddress)
         );
-        connectionBadge_->setText(state.reachable ? tr("Online") : tr("Offline"));
+        connectionBadge_->setOnline(state.reachable);
+        favoriteButton_->setChecked(
+            settings_ != nullptr
+                && settings_->value(QStringLiteral("devices/favorites"))
+                    .toStringList().contains(info.stableId())
+        );
         powerOnButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
         powerOffButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
     };
@@ -269,7 +324,7 @@ void MainWindow::updateSelection(DeviceController* controller) {
 }
 
 void MainWindow::updateStatusText() {
-    const int count = manager_->devices().size();
+    const int count = static_cast<int>(manager_->devices().size());
     statusLabel_->setText(
         count == 0 ? tr("No LAN devices found") : tr("%n device(s) found", "", count)
     );

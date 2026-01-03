@@ -74,7 +74,13 @@ void DashboardPage::refresh() {
             ? tr("Unknown")
             : tr("%1 K").arg(state.colorTemperature)
     );
-    colorModeLabel_->setText(QString::number(static_cast<int>(state.colorMode)));
+    switch (state.colorMode) {
+    case ColorMode::ColorTemperature: colorModeLabel_->setText(tr("White temperature")); break;
+    case ColorMode::Rgb: colorModeLabel_->setText(tr("RGB")); break;
+    case ColorMode::Hsv: colorModeLabel_->setText(tr("HSV")); break;
+    case ColorMode::ColorFlow: colorModeLabel_->setText(tr("Color flow")); break;
+    case ColorMode::Unknown: colorModeLabel_->setText(tr("Unknown")); break;
+    }
     lastSeenLabel_->setText(
         state.lastSeen.isValid()
             ? QLocale::system().toString(

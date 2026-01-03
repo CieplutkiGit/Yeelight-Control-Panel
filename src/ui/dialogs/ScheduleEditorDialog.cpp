@@ -106,7 +106,7 @@ void ScheduleEditorDialog::setSchedule(const ScheduledAction& schedule) {
     ));
     valueEdit_->setText(schedule.value.toString());
     timeEdit_->setTime(schedule.time);
-    for (int index = 0; index < dayChecks_.size(); ++index) {
+    for (int index = 0; index < static_cast<int>(dayChecks_.size()); ++index) {
         dayChecks_.at(index)->setChecked(schedule.days.contains(
             static_cast<Qt::DayOfWeek>(index + 1)
         ));
@@ -124,7 +124,7 @@ ScheduledAction ScheduleEditorDialog::schedule() const {
     result.type = static_cast<ScheduledActionType>(actionCombo_->currentData().toInt());
     result.value = valueEdit_->text().trimmed();
     result.time = timeEdit_->time();
-    for (int index = 0; index < dayChecks_.size(); ++index) {
+    for (int index = 0; index < static_cast<int>(dayChecks_.size()); ++index) {
         if (dayChecks_.at(index)->isChecked()) {
             result.days.insert(static_cast<Qt::DayOfWeek>(index + 1));
         }
@@ -156,4 +156,3 @@ void ScheduleEditorDialog::validate() {
     errorLabel_->setText(error);
     buttons_->button(QDialogButtonBox::Save)->setEnabled(error.isEmpty());
 }
-

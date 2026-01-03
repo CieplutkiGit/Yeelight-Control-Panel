@@ -18,6 +18,9 @@ int Application::run() {
     for (const auto& device : settings_.loadDevices()) {
         deviceManager_.restoreRememberedDevice(device);
     }
+    if (settings_.value(QStringLiteral("devices/autoConnect"), true).toBool()) {
+        deviceManager_.connectAll();
+    }
     const auto persistDevices = [this] {
         settings_.saveDevices(deviceManager_.rememberedDevices());
     };

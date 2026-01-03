@@ -54,7 +54,7 @@ signals:
 
 private:
     bool requireCapability(const QString& method);
-    void sendResult(const CommandResult& result, bool optimistic = false);
+    void sendResult(const CommandResult& result);
     void createConnection();
     void applyProperties(const QVariantMap& properties);
 

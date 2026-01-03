@@ -54,6 +54,12 @@ add_executable(test_ui_smoke
     ../src/ui/pages/LogsPage.h
     ../src/ui/widgets/SegmentPreviewWidget.cpp
     ../src/ui/widgets/SegmentPreviewWidget.h
+    ../src/ui/widgets/ConnectionBadge.cpp
+    ../src/ui/widgets/ConnectionBadge.h
+    ../src/ui/widgets/DeviceListDelegate.cpp
+    ../src/ui/widgets/DeviceListDelegate.h
+    ../src/ui/widgets/EffectTimelineWidget.cpp
+    ../src/ui/widgets/EffectTimelineWidget.h
     ../src/ui/widgets/ColorPreviewWidget.cpp
     ../src/ui/widgets/ColorPreviewWidget.h
     ../src/ui/dialogs/AddDeviceDialog.cpp
@@ -77,6 +83,8 @@ add_executable(test_effects
     ../src/ui/pages/EffectsPage.h
     ../src/ui/dialogs/EffectEditorDialog.cpp
     ../src/ui/dialogs/EffectEditorDialog.h
+    ../src/ui/widgets/EffectTimelineWidget.cpp
+    ../src/ui/widgets/EffectTimelineWidget.h
 )
 target_link_libraries(test_effects PRIVATE yeelight_core Qt6::Widgets Qt6::Test)
 add_test(NAME effects COMMAND test_effects)

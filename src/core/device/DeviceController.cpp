@@ -40,7 +40,7 @@ void DeviceController::updateDiscovery(const DeviceInfo& info, const DeviceState
     const bool endpointChanged = info_.ipAddress != info.ipAddress || info_.port != info.port;
     const QString preservedName = info_.name;
     info_ = info;
-    if (!preservedName.isEmpty() && info_.name.isEmpty()) {
+    if (!preservedName.isEmpty()) {
         info_.name = preservedName;
     }
     state_ = state;
@@ -249,8 +249,7 @@ bool DeviceController::requireCapability(const QString& method) {
     return false;
 }
 
-void DeviceController::sendResult(const CommandResult& result, bool optimistic) {
-    Q_UNUSED(optimistic)
+void DeviceController::sendResult(const CommandResult& result) {
     if (!result.success) {
         emit commandError(result.error);
         return;

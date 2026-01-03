@@ -1,6 +1,7 @@
 #include "EffectEditorDialog.h"
 
 #include "../../core/protocol/YeelightCommand.h"
+#include "../widgets/EffectTimelineWidget.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -44,6 +45,7 @@ EffectEditorDialog::EffectEditorDialog(bool developerMode, QWidget* parent)
     , repeatSpin_(new QSpinBox(this))
     , finishCombo_(new QComboBox(this))
     , stepTable_(new QTableWidget(0, 4, this))
+    , timeline_(new EffectTimelineWidget(this))
     , errorLabel_(new QLabel(this))
     , expressionLabel_(new QLabel(this))
     , buttons_(new QDialogButtonBox(
@@ -90,6 +92,7 @@ EffectEditorDialog::EffectEditorDialog(bool developerMode, QWidget* parent)
     auto* layout = new QVBoxLayout(this);
     layout->addLayout(form);
     layout->addWidget(stepTable_, 1);
+    layout->addWidget(timeline_);
     layout->addLayout(rowButtons);
     layout->addWidget(errorLabel_);
     layout->addWidget(expressionLabel_);
@@ -212,6 +215,7 @@ void EffectEditorDialog::validate() {
         }
     }
     const EffectPreset current = effect();
+    timeline_->setEffect(current);
     if (error.isEmpty() && current.name.isEmpty()) {
         error = tr("Enter an effect name.");
     } else if (error.isEmpty()) {

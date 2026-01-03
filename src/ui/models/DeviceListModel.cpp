@@ -1,9 +1,20 @@
 #include "DeviceListModel.h"
 
-DeviceListModel::DeviceListModel(DeviceManager* manager, QObject* parent)
+DeviceListModel::DeviceListModel(
+    DeviceManager* manager,
+    SettingsRepository* settings,
+    QObject* parent
+)
     : QAbstractListModel(parent)
     , manager_(manager)
+    , settings_(settings)
     , devices_(manager->devices()) {
+    for (auto* controller : devices_) {
+        connect(controller, &DeviceController::infoChanged, this,
+            [this, controller] { refreshController(controller); });
+        connect(controller, &DeviceController::stateChanged, this,
+            [this, controller] { refreshController(controller); });
+    }
     connect(manager_, &DeviceManager::deviceAdded,
         this, &DeviceListModel::addController);
     connect(manager_, &DeviceManager::deviceUpdated,
@@ -35,10 +46,14 @@ QVariant DeviceListModel::data(const QModelIndex& index, int role) const {
     const QString displayName = info.name.isEmpty()
         ? (info.model.isEmpty() ? info.ipAddress : info.model)
         : info.name;
+    const bool favorite = settings_ != nullptr
+        && settings_->value(QStringLiteral("devices/favorites")).toStringList()
+            .contains(info.stableId());
     switch (role) {
     case Qt::DisplayRole:
-        return QStringLiteral("%1\n%2 · %3")
+        return QStringLiteral("%1%2\n%3 · %4")
             .arg(
+                favorite ? QStringLiteral("★ ") : QString(),
                 displayName,
                 info.model.isEmpty() ? QStringLiteral("Yeelight") : info.model,
                 info.ipAddress
@@ -50,7 +65,7 @@ QVariant DeviceListModel::data(const QModelIndex& index, int role) const {
     case AddressRole: return info.ipAddress;
     case OnlineRole: return state.reachable;
     case PowerRole: return static_cast<int>(state.power);
-    case FavoriteRole: return false;
+    case FavoriteRole: return favorite;
     case ControllerRole: return QVariant::fromValue(controller);
     default: return {};
     }
@@ -72,6 +87,12 @@ DeviceController* DeviceListModel::controllerAt(int row) const {
     return row >= 0 && row < static_cast<int>(devices_.size())
         ? devices_.at(row)
         : nullptr;
+}
+
+void DeviceListModel::refreshAll() {
+    if (!devices_.isEmpty()) {
+        emit dataChanged(index(0), index(static_cast<int>(devices_.size()) - 1));
+    }
 }
 
 void DeviceListModel::addController(DeviceController* controller) {

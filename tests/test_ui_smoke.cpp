@@ -31,7 +31,7 @@ void UiSmokeTest::unsupportedControlsAreDisabled() {
     DeviceInfo info;
     info.ipAddress = QStringLiteral("127.0.0.1");
     DeviceController controller(info);
-    ColorPage page;
+    ColorPage page(nullptr);
     page.setDevice(&controller);
     QVERIFY(!page.findChild<QSlider*>(
         QStringLiteral("brightnessSlider"))->isEnabled());
@@ -51,7 +51,7 @@ void UiSmokeTest::stateUpdatesDoNotSendCommands() {
     state.colorTemperature = 3500;
     DeviceController controller(info, state);
     QSignalSpy unsupported(&controller, &DeviceController::unsupportedOperation);
-    ColorPage page;
+    ColorPage page(nullptr);
     page.setDevice(&controller);
     QCOMPARE(
         page.findChild<QSlider*>(QStringLiteral("brightnessSlider"))->value(),

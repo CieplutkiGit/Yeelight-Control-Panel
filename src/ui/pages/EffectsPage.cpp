@@ -17,7 +17,9 @@ EffectPreset makeEffect(
     EffectPreset effect;
     effect.id = QUuid::createUuid();
     effect.name = name;
-    effect.steps = QList<EffectStep>(steps);
+    for (const auto& step : steps) {
+        effect.steps.append(step);
+    }
     effect.repeatCount = repeatCount;
     return effect;
 }

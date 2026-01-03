@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../core/device/DeviceController.h"
+#include "../../core/persistence/SettingsRepository.h"
 
 #include <QWidget>
 
@@ -16,7 +17,10 @@ class ColorPage final : public QWidget {
     Q_OBJECT
 
 public:
-    explicit ColorPage(QWidget* parent = nullptr);
+    explicit ColorPage(
+        SettingsRepository* settings = nullptr,
+        QWidget* parent = nullptr
+    );
     void setDevice(DeviceController* device);
 
 private:
@@ -28,6 +32,7 @@ private:
     void sendPending();
 
     DeviceController* device_ = nullptr;
+    SettingsRepository* settings_;
     ColorPreviewWidget* preview_;
     QLineEdit* hexEdit_;
     QSlider* brightnessSlider_;
@@ -38,4 +43,3 @@ private:
     QTimer* throttleTimer_;
     std::function<void()> pendingAction_;
 };
-

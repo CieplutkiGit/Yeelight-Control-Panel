@@ -96,7 +96,7 @@ DeviceInfo YeelightConnection::deviceInfo() const {
 }
 
 int YeelightConnection::queuedCommandCount() const {
-    return queue_.size();
+    return static_cast<int>(queue_.size());
 }
 
 bool YeelightConnection::isCritical(const QString& method) {
@@ -129,7 +129,7 @@ void YeelightConnection::queueCommand(const QJsonObject& command) {
         }
     }
 
-    if (queue_.size() >= MaximumQueuedCommands) {
+    if (static_cast<int>(queue_.size()) >= MaximumQueuedCommands) {
         auto removable = std::find_if(queue_.begin(), queue_.end(),
             [](const QueuedCommand& item) { return !item.critical; });
         if (removable != queue_.end()) {

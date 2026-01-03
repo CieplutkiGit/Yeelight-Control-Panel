@@ -53,9 +53,6 @@ public:
 private:
     explicit AppLogger(QObject* parent = nullptr);
     void appendToFile(const Entry& entry);
-    static QString severityName(Severity severity);
-
     QList<Entry> entries_;
     QFile logFile_;
 };
-
