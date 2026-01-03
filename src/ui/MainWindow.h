@@ -7,6 +7,8 @@
 class DashboardPage;
 class ColorPage;
 class EffectsPage;
+class AutomationsPage;
+class AutomationEngine;
 class SettingsRepository;
 class DeviceListModel;
 class QLabel;
@@ -23,6 +25,7 @@ public:
     explicit MainWindow(
         DeviceManager* manager,
         SettingsRepository* settings,
+        AutomationEngine* automations,
         QWidget* parent = nullptr
     );
 
@@ -57,4 +60,5 @@ private:
     DashboardPage* dashboardPage_;
     ColorPage* colorPage_;
     EffectsPage* effectsPage_;
+    AutomationsPage* automationsPage_;
 };

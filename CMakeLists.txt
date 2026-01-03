@@ -43,6 +43,8 @@ add_library(yeelight_core STATIC
     src/core/persistence/SettingsRepository.h
     src/core/logging/AppLogger.cpp
     src/core/logging/AppLogger.h
+    src/core/automation/AutomationEngine.cpp
+    src/core/automation/AutomationEngine.h
 )
 target_include_directories(yeelight_core PUBLIC src)
 target_link_libraries(yeelight_core PUBLIC Qt6::Core Qt6::Gui Qt6::Network)
@@ -59,12 +61,16 @@ add_executable(YeelightControlPanel
     src/ui/dialogs/AddDeviceDialog.h
     src/ui/dialogs/EffectEditorDialog.cpp
     src/ui/dialogs/EffectEditorDialog.h
+    src/ui/dialogs/ScheduleEditorDialog.cpp
+    src/ui/dialogs/ScheduleEditorDialog.h
     src/ui/pages/DashboardPage.cpp
     src/ui/pages/DashboardPage.h
     src/ui/pages/ColorPage.cpp
     src/ui/pages/ColorPage.h
     src/ui/pages/EffectsPage.cpp
     src/ui/pages/EffectsPage.h
+    src/ui/pages/AutomationsPage.cpp
+    src/ui/pages/AutomationsPage.h
     src/ui/widgets/ColorPreviewWidget.cpp
     src/ui/widgets/ColorPreviewWidget.h
     resources/resources.qrc

@@ -5,10 +5,12 @@
 #include "pages/ColorPage.h"
 #include "pages/DashboardPage.h"
 #include "pages/EffectsPage.h"
+#include "pages/AutomationsPage.h"
 
 #include <QAction>
 #include <QCloseEvent>
 #include <QHBoxLayout>
+#include <QHostAddress>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListView>
@@ -27,6 +29,7 @@
 MainWindow::MainWindow(
     DeviceManager* manager,
     SettingsRepository* settings,
+    AutomationEngine* automations,
     QWidget* parent
 )
     : QMainWindow(parent)
@@ -44,7 +47,8 @@ MainWindow::MainWindow(
     , tabs_(new QTabWidget(this))
     , dashboardPage_(new DashboardPage(this))
     , colorPage_(new ColorPage(this))
-    , effectsPage_(new EffectsPage(settings, this)) {
+    , effectsPage_(new EffectsPage(settings, this))
+    , automationsPage_(new AutomationsPage(automations, manager, this)) {
     setWindowTitle(tr("Yeelight LAN"));
     resize(1180, 760);
     setMinimumSize(900, 600);
@@ -132,10 +136,7 @@ MainWindow::MainWindow(
     tabs_->addTab(dashboardPage_, tr("Dashboard"));
     tabs_->addTab(colorPage_, tr("Color"));
     tabs_->addTab(effectsPage_, tr("Effects"));
-    tabs_->addTab(makeInformationalPage(
-        tr("Automations"),
-        tr("Local schedules run only while Yeelight LAN is open.")
-    ), tr("Automations"));
+    tabs_->addTab(automationsPage_, tr("Automations"));
     tabs_->addTab(makeInformationalPage(
         tr("Device"),
         tr("Connection details and device diagnostics.")
@@ -281,10 +282,16 @@ void MainWindow::addManualDevice() {
     if (dialog.exec() != QDialog::Accepted) {
         return;
     }
-    if (manager_->addManualDevice(dialog.address(), dialog.port())
+    if (manager_->addManualDevice(
+            dialog.address(),
+            dialog.port(),
+            dialog.displayName(),
+            dialog.rememberDevice()
+        )
         && dialog.connectImmediately()) {
+        const QString normalizedAddress = QHostAddress(dialog.address()).toString();
         auto* controller = manager_->device(
-            QStringLiteral("%1:%2").arg(dialog.address()).arg(dialog.port())
+            QStringLiteral("%1:%2").arg(normalizedAddress).arg(dialog.port())
         );
         if (controller != nullptr) {
             controller->connectDevice();

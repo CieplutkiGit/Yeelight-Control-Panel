@@ -44,6 +44,10 @@ add_executable(test_ui_smoke
     ../src/ui/pages/EffectsPage.h
     ../src/ui/dialogs/EffectEditorDialog.cpp
     ../src/ui/dialogs/EffectEditorDialog.h
+    ../src/ui/pages/AutomationsPage.cpp
+    ../src/ui/pages/AutomationsPage.h
+    ../src/ui/dialogs/ScheduleEditorDialog.cpp
+    ../src/ui/dialogs/ScheduleEditorDialog.h
     ../src/ui/widgets/ColorPreviewWidget.cpp
     ../src/ui/widgets/ColorPreviewWidget.h
     ../src/ui/dialogs/AddDeviceDialog.cpp
@@ -70,3 +74,7 @@ add_executable(test_effects
 )
 target_link_libraries(test_effects PRIVATE yeelight_core Qt6::Widgets Qt6::Test)
 add_test(NAME effects COMMAND test_effects)
+
+add_executable(test_automation_engine test_automation_engine.cpp)
+target_link_libraries(test_automation_engine PRIVATE yeelight_core Qt6::Test)
+add_test(NAME automation_engine COMMAND test_automation_engine)

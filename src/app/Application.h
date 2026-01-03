@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/device/DeviceManager.h"
+#include "../core/automation/AutomationEngine.h"
 #include "../core/persistence/SettingsRepository.h"
 
 #include <QApplication>
@@ -21,6 +22,6 @@ private:
 
     SettingsRepository settings_;
     DeviceManager deviceManager_;
+    AutomationEngine automationEngine_;
     std::unique_ptr<MainWindow> mainWindow_;
 };
-

@@ -5,6 +5,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QSet>
 #include <QTimer>
 
 class DeviceManager final : public QObject {
@@ -15,7 +16,14 @@ public:
 
     void startDiscovery();
     void stopDiscovery();
-    bool addManualDevice(const QString& ipAddress, quint16 port = 55443);
+    bool addManualDevice(
+        const QString& ipAddress,
+        quint16 port = 55443,
+        const QString& displayName = {},
+        bool remember = true
+    );
+    void restoreRememberedDevice(const DeviceInfo& info);
+    [[nodiscard]] QList<DeviceInfo> rememberedDevices() const;
     void removeRememberedDevice(const QString& stableId);
     void connectAll();
     void disconnectAll();
@@ -34,6 +42,6 @@ private:
 
     DiscoveryService discovery_;
     QHash<QString, DeviceController*> devices_;
+    QSet<QString> rememberedIds_;
     QTimer offlineTimer_;
 };
-

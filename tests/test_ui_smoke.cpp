@@ -18,7 +18,7 @@ private slots:
 
 void UiSmokeTest::windowOpensWithEmptyState() {
     DeviceManager manager;
-    MainWindow window(&manager, nullptr);
+    MainWindow window(&manager, nullptr, nullptr);
     window.show();
     QTest::qWait(20);
     auto* title = window.findChild<QLabel*>(QStringLiteral("emptyStateTitle"));

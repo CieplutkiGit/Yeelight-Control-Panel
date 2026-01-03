@@ -37,7 +37,12 @@ void DeviceManager::stopDiscovery() {
     discovery_.stop();
 }
 
-bool DeviceManager::addManualDevice(const QString& ipAddress, quint16 port) {
+bool DeviceManager::addManualDevice(
+    const QString& ipAddress,
+    quint16 port,
+    const QString& displayName,
+    bool remember
+) {
     const QHostAddress address(ipAddress);
     if (address.isNull() || port == 0) {
         emit errorOccurred(QStringLiteral("Enter a valid IPv4 or IPv6 address and port."));
@@ -46,12 +51,36 @@ bool DeviceManager::addManualDevice(const QString& ipAddress, quint16 port) {
     DeviceInfo info;
     info.ipAddress = address.toString();
     info.port = port;
+    info.name = displayName;
+    if (remember) {
+        rememberedIds_.insert(info.stableId());
+    }
     DeviceState state;
     addOrUpdate(info, state);
     return true;
 }
 
+void DeviceManager::restoreRememberedDevice(const DeviceInfo& info) {
+    if (QHostAddress(info.ipAddress).isNull() || info.port == 0) {
+        emit errorOccurred(QStringLiteral("A remembered device has an invalid address."));
+        return;
+    }
+    rememberedIds_.insert(info.stableId());
+    addOrUpdate(info, {});
+}
+
+QList<DeviceInfo> DeviceManager::rememberedDevices() const {
+    QList<DeviceInfo> result;
+    for (const auto& id : rememberedIds_) {
+        if (auto* controller = devices_.value(id, nullptr)) {
+            result.append(controller->info());
+        }
+    }
+    return result;
+}
+
 void DeviceManager::removeRememberedDevice(const QString& stableId) {
+    rememberedIds_.remove(stableId);
     auto* controller = devices_.take(stableId);
     if (controller == nullptr) {
         return;
@@ -97,8 +126,12 @@ void DeviceManager::addOrUpdate(const DeviceInfo& info, const DeviceState& state
 
     if (!existingKey.isEmpty()) {
         auto* controller = devices_.take(existingKey);
+        const bool remembered = rememberedIds_.remove(existingKey);
         controller->updateDiscovery(info, state);
         devices_.insert(info.stableId(), controller);
+        if (remembered) {
+            rememberedIds_.insert(info.stableId());
+        }
         emit deviceUpdated(controller);
         return;
     }
@@ -107,4 +140,3 @@ void DeviceManager::addOrUpdate(const DeviceInfo& info, const DeviceState& state
     devices_.insert(info.stableId(), controller);
     emit deviceAdded(controller);
 }
-

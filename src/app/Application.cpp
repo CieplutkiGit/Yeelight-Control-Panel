@@ -6,7 +6,8 @@
 #include <QStyleHints>
 
 Application::Application(int& argc, char** argv)
-    : QApplication(argc, argv) {
+    : QApplication(argc, argv)
+    , automationEngine_(&deviceManager_, &settings_, this) {
     setApplicationName(QStringLiteral("Yeelight LAN"));
     setApplicationDisplayName(QStringLiteral("Yeelight LAN"));
     setApplicationVersion(QStringLiteral("2.0.0"));
@@ -14,13 +15,29 @@ Application::Application(int& argc, char** argv)
 }
 
 int Application::run() {
+    for (const auto& device : settings_.loadDevices()) {
+        deviceManager_.restoreRememberedDevice(device);
+    }
+    const auto persistDevices = [this] {
+        settings_.saveDevices(deviceManager_.rememberedDevices());
+    };
+    connect(&deviceManager_, &DeviceManager::deviceAdded, this,
+        [persistDevices](DeviceController*) { persistDevices(); });
+    connect(&deviceManager_, &DeviceManager::deviceUpdated, this,
+        [persistDevices](DeviceController*) { persistDevices(); });
+    connect(&deviceManager_, &DeviceManager::deviceRemoved, this,
+        [persistDevices](const QString&) { persistDevices(); });
     const QString theme = settings_.value(
         QStringLiteral("ui/theme"),
         QStringLiteral("system")
     ).toString();
     applyTheme(theme);
 
-    mainWindow_ = std::make_unique<MainWindow>(&deviceManager_, &settings_);
+    mainWindow_ = std::make_unique<MainWindow>(
+        &deviceManager_,
+        &settings_,
+        &automationEngine_
+    );
     mainWindow_->restoreGeometry(
         settings_.value(QStringLiteral("ui/windowGeometry")).toByteArray()
     );
