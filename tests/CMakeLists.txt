@@ -84,3 +84,8 @@ add_test(NAME effects COMMAND test_effects)
 add_executable(test_automation_engine test_automation_engine.cpp)
 target_link_libraries(test_automation_engine PRIVATE yeelight_core Qt6::Test)
 add_test(NAME automation_engine COMMAND test_automation_engine)
+
+add_test(
+    NAME source_policy
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/check_lan_only.cmake
+)
