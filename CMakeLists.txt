@@ -71,8 +71,14 @@ add_executable(YeelightControlPanel
     src/ui/pages/EffectsPage.h
     src/ui/pages/AutomationsPage.cpp
     src/ui/pages/AutomationsPage.h
+    src/ui/pages/DevicePage.cpp
+    src/ui/pages/DevicePage.h
+    src/ui/pages/LogsPage.cpp
+    src/ui/pages/LogsPage.h
     src/ui/widgets/ColorPreviewWidget.cpp
     src/ui/widgets/ColorPreviewWidget.h
+    src/ui/widgets/SegmentPreviewWidget.cpp
+    src/ui/widgets/SegmentPreviewWidget.h
     resources/resources.qrc
 )
 

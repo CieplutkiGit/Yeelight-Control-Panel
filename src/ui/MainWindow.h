@@ -8,6 +8,8 @@ class DashboardPage;
 class ColorPage;
 class EffectsPage;
 class AutomationsPage;
+class DevicePage;
+class LogsPage;
 class AutomationEngine;
 class SettingsRepository;
 class DeviceListModel;
@@ -61,4 +63,6 @@ private:
     ColorPage* colorPage_;
     EffectsPage* effectsPage_;
     AutomationsPage* automationsPage_;
+    DevicePage* devicePage_;
+    LogsPage* logsPage_;
 };

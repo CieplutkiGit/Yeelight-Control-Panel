@@ -7,6 +7,7 @@
 #include "../protocol/YeelightCommand.h"
 
 #include <QColor>
+#include <QByteArray>
 #include <QHash>
 #include <QObject>
 
@@ -37,9 +38,10 @@ public:
     void setColorTemperature(int kelvin);
     void startEffect(const EffectPreset& preset);
     void stopEffect();
+    void setLocalName(const QString& name);
     void setDeviceName(const QString& name);
     void setTransitionDuration(int durationMs);
-    void sendRaw(const QString& method, const QJsonArray& parameters);
+    int sendRaw(const QString& method, const QJsonArray& parameters);
 
 signals:
     void infoChanged(const DeviceInfo& info);
@@ -47,6 +49,7 @@ signals:
     void connectionStatusChanged(YeelightConnection::Status status);
     void unsupportedOperation(const QString& message);
     void commandError(const QString& message);
+    void rawRequest(int requestId, const QByteArray& request);
     void rawResponse(int requestId, const QJsonArray& result);
 
 private:

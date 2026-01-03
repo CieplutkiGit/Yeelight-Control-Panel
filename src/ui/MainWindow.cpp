@@ -6,6 +6,8 @@
 #include "pages/DashboardPage.h"
 #include "pages/EffectsPage.h"
 #include "pages/AutomationsPage.h"
+#include "pages/DevicePage.h"
+#include "pages/LogsPage.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -48,7 +50,9 @@ MainWindow::MainWindow(
     , dashboardPage_(new DashboardPage(this))
     , colorPage_(new ColorPage(this))
     , effectsPage_(new EffectsPage(settings, this))
-    , automationsPage_(new AutomationsPage(automations, manager, this)) {
+    , automationsPage_(new AutomationsPage(automations, manager, this))
+    , devicePage_(new DevicePage(manager, this))
+    , logsPage_(new LogsPage(settings, this)) {
     setWindowTitle(tr("Yeelight LAN"));
     resize(1180, 760);
     setMinimumSize(900, 600);
@@ -137,14 +141,8 @@ MainWindow::MainWindow(
     tabs_->addTab(colorPage_, tr("Color"));
     tabs_->addTab(effectsPage_, tr("Effects"));
     tabs_->addTab(automationsPage_, tr("Automations"));
-    tabs_->addTab(makeInformationalPage(
-        tr("Device"),
-        tr("Connection details and device diagnostics.")
-    ), tr("Device"));
-    tabs_->addTab(makeInformationalPage(
-        tr("Logs"),
-        tr("Local application and protocol messages.")
-    ), tr("Logs"));
+    tabs_->addTab(devicePage_, tr("Device"));
+    tabs_->addTab(logsPage_, tr("Logs"));
     contentStack_->addWidget(emptyPage);
     contentStack_->addWidget(tabs_);
     mainLayout->addWidget(contentStack_, 1);
@@ -166,6 +164,17 @@ MainWindow::MainWindow(
         connect(action, &QAction::triggered, this,
             [this, theme = pair.second] { emit themeRequested(theme); });
     }
+    auto* developerAction = viewMenu->addAction(tr("Developer mode"));
+    developerAction->setCheckable(true);
+    developerAction->setChecked(
+        settings != nullptr
+            && settings->value(
+                QStringLiteral("settings/developerMode"),
+                false
+            ).toBool()
+    );
+    connect(developerAction, &QAction::toggled,
+        logsPage_, &LogsPage::setDeveloperMode);
     auto* helpMenu = menuBar()->addMenu(tr("&Help"));
     connect(helpMenu->addAction(tr("About")), &QAction::triggered,
         this, &MainWindow::showAbout);
@@ -178,6 +187,8 @@ MainWindow::MainWindow(
     connect(emptyDiscover, &QPushButton::clicked, manager_, &DeviceManager::startDiscovery);
     connect(addButton, &QPushButton::clicked, this, &MainWindow::addManualDevice);
     connect(emptyAdd, &QPushButton::clicked, this, &MainWindow::addManualDevice);
+    connect(devicePage_, &DevicePage::addDeviceRequested,
+        this, &MainWindow::addManualDevice);
     connect(reconnectButton, &QPushButton::clicked, this, [this] {
         if (selectedDevice_ != nullptr) {
             selectedDevice_->connectDevice();
@@ -241,6 +252,8 @@ void MainWindow::updateSelection(DeviceController* controller) {
     dashboardPage_->setDevice(selectedDevice_);
     colorPage_->setDevice(selectedDevice_);
     effectsPage_->setDevice(selectedDevice_);
+    devicePage_->setDevice(selectedDevice_);
+    logsPage_->setDevice(selectedDevice_);
     const bool selected = selectedDevice_ != nullptr;
     contentStack_->setCurrentIndex(selected ? 1 : 0);
     powerOnButton_->setEnabled(selected);

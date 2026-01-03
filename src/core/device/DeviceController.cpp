@@ -196,6 +196,16 @@ void DeviceController::stopEffect() {
     sendResult(YeelightCommand::stopColorFlow(nextRequestId_++));
 }
 
+void DeviceController::setLocalName(const QString& name) {
+    const QString trimmed = name.trimmed();
+    if (trimmed.isEmpty()) {
+        emit commandError(QStringLiteral("Local device name cannot be empty."));
+        return;
+    }
+    info_.name = trimmed;
+    emit infoChanged(info_);
+}
+
 void DeviceController::setDeviceName(const QString& name) {
     if (!requireCapability(QStringLiteral("set_name"))) {
         return;
@@ -213,20 +223,20 @@ void DeviceController::setTransitionDuration(int durationMs) {
     transitionDurationMs_ = durationMs;
 }
 
-void DeviceController::sendRaw(const QString& method, const QJsonArray& parameters) {
-    if (!requireCapability(method)) {
-        return;
-    }
+int DeviceController::sendRaw(const QString& method, const QJsonArray& parameters) {
     if (method.trimmed().isEmpty()) {
         emit commandError(QStringLiteral("Raw command method cannot be empty."));
-        return;
+        return -1;
     }
+    const int requestId = nextRequestId_++;
     QJsonObject command{
-        {QStringLiteral("id"), nextRequestId_++},
+        {QStringLiteral("id"), requestId},
         {QStringLiteral("method"), method},
         {QStringLiteral("params"), parameters}
     };
+    emit rawRequest(requestId, YeelightCommand::serialize(command));
     connection_->send(command);
+    return requestId;
 }
 
 bool DeviceController::requireCapability(const QString& method) {

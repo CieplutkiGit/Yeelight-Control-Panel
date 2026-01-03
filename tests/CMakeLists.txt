@@ -48,6 +48,12 @@ add_executable(test_ui_smoke
     ../src/ui/pages/AutomationsPage.h
     ../src/ui/dialogs/ScheduleEditorDialog.cpp
     ../src/ui/dialogs/ScheduleEditorDialog.h
+    ../src/ui/pages/DevicePage.cpp
+    ../src/ui/pages/DevicePage.h
+    ../src/ui/pages/LogsPage.cpp
+    ../src/ui/pages/LogsPage.h
+    ../src/ui/widgets/SegmentPreviewWidget.cpp
+    ../src/ui/widgets/SegmentPreviewWidget.h
     ../src/ui/widgets/ColorPreviewWidget.cpp
     ../src/ui/widgets/ColorPreviewWidget.h
     ../src/ui/dialogs/AddDeviceDialog.cpp
