@@ -224,21 +224,6 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     QMainWindow::closeEvent(event);
 }
 
-QWidget* MainWindow::makeInformationalPage(
-    const QString& title,
-    const QString& text
-) {
-    auto* page = new QWidget(tabs_);
-    auto* layout = new QVBoxLayout(page);
-    auto* titleLabel = new QLabel(title, page);
-    auto* textLabel = new QLabel(text, page);
-    textLabel->setWordWrap(true);
-    layout->addWidget(titleLabel);
-    layout->addWidget(textLabel);
-    layout->addStretch();
-    return page;
-}
-
 void MainWindow::selectDevice(const QModelIndex& proxyIndex) {
     const QModelIndex sourceIndex = proxyModel_->mapToSource(proxyIndex);
     updateSelection(deviceModel_->controllerAt(sourceIndex.row()));

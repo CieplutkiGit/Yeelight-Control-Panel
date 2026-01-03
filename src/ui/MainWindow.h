@@ -39,7 +39,6 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    QWidget* makeInformationalPage(const QString& title, const QString& text);
     void selectDevice(const QModelIndex& proxyIndex);
     void updateSelection(DeviceController* controller);
     void updateStatusText();
