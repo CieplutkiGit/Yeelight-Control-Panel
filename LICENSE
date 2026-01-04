@@ -1,16 +1,32 @@
-Copyright (c) 2023-2026 CieplutkiGit and contributors
-
 All rights reserved.
 
+This license applies only to the original source code, original documentation,
+and other original material created specifically for this project by
+CieplutkiGit and its contributors.
+
 No permission is granted to use, copy, modify, merge, publish, distribute,
-sublicense, or sell copies of this software except with prior written
-permission from the copyright holder.
+sublicense, or sell copies of the original material without prior written
+permission from the applicable copyright holder.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
-OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+This project is an independent and unofficial application that communicates
+with compatible devices using Yeelight's publicly documented third-party LAN
+control protocol.
 
+Yeelight, its product names, trademarks, official software, firmware, protocol
+documentation, logos, artwork, and other Yeelight materials remain the property
+of their respective rights holders. No rights to those materials are granted
+under this license.
+
+This project is not affiliated with, authorized by, sponsored by, or endorsed
+by Yeelight or its associated companies.
+
+Any third-party software, libraries, documentation, trademarks, or other
+materials included in or used by this project remain subject to their own
+copyright notices, licenses, and terms.
+
+THE ORIGINAL MATERIAL COVERED BY THIS LICENSE IS PROVIDED "AS IS", WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE MATERIAL OR ITS USE.
