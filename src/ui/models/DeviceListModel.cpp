@@ -107,7 +107,7 @@ void DeviceListModel::addController(DeviceController* controller) {
 }
 
 void DeviceListModel::refreshController(DeviceController* controller) {
-    const int row = devices_.indexOf(controller);
+    const int row = static_cast<int>(devices_.indexOf(controller));
     if (row >= 0) {
         const QModelIndex changed = index(row);
         emit dataChanged(changed, changed);

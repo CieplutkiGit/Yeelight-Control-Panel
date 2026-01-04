@@ -25,7 +25,7 @@ void YeelightMessageParser::feed(const QByteArray& bytes) {
         if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
             const QString message = QStringLiteral("Malformed Yeelight message: %1")
                 .arg(parseError.errorString());
-            qCWarning(protocolLog) << message;
+            qCWarning(protocolLog, "%s", qUtf8Printable(message));
             emit protocolError(message);
             continue;
         }

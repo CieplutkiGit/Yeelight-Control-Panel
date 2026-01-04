@@ -42,5 +42,5 @@ void ConnectionTest::coalescesContinuousControls() {
     connection.disconnectFromDevice();
 }
 
-QTEST_MAIN(ConnectionTest)
+QTEST_GUILESS_MAIN(ConnectionTest)
 #include "test_connection.moc"

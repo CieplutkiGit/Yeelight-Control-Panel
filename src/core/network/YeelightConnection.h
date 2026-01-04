@@ -25,6 +25,7 @@ public:
     Q_ENUM(Status)
 
     explicit YeelightConnection(const DeviceInfo& device, QObject* parent = nullptr);
+    ~YeelightConnection() override;
 
     void connectToDevice();
     void disconnectFromDevice();

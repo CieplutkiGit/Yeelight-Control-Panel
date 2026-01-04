@@ -48,6 +48,11 @@ YeelightConnection::YeelightConnection(const DeviceInfo& device, QObject* parent
         this, &YeelightConnection::protocolError);
 }
 
+YeelightConnection::~YeelightConnection() {
+    disconnect(&socket_, nullptr, this, nullptr);
+    socket_.abort();
+}
+
 void YeelightConnection::connectToDevice() {
     explicitlyDisconnected_ = false;
     reconnectTimer_.stop();
@@ -196,7 +201,11 @@ void YeelightConnection::handleReadyRead() {
 
 void YeelightConnection::handleSocketError(QAbstractSocket::SocketError error) {
     Q_UNUSED(error)
-    qCWarning(connectionLog) << "Yeelight connection error:" << socket_.errorString();
+    qCWarning(
+        connectionLog,
+        "Yeelight connection error: %s",
+        qUtf8Printable(socket_.errorString())
+    );
     setStatus(Status::Error);
     if (!explicitlyDisconnected_ && socket_.state() == QAbstractSocket::UnconnectedState) {
         scheduleReconnect();

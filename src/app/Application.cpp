@@ -14,6 +14,8 @@ Application::Application(int& argc, char** argv)
     setOrganizationName(QStringLiteral("CieplutkiGit"));
 }
 
+Application::~Application() = default;
+
 int Application::run() {
     for (const auto& device : settings_.loadDevices()) {
         deviceManager_.restoreRememberedDevice(device);
