@@ -193,11 +193,6 @@ not add Internet dependencies. Review the repository license before
 contributing.
 
 ## License
-
-Copyright © 2023–2026 CieplutkiGit and contributors.
-
-This project is source-available but is not licensed as open-source software.
-No permission is granted to copy, modify, distribute, publish, sublicense, or
-sell the software without prior written permission.
+No license or the basic one or idk just copy pasted it its build on top of yeelight api so idk I dont take responsibilty or some shi 
 
 See [LICENSE](LICENSE) for the complete terms.
