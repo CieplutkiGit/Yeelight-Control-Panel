@@ -1,37 +1,159 @@
-QWidget {
-    color: #e8ecf4;
-    background: #151922;
+QMainWindow {
+    color: #e8edf6;
+    background: #080b10;
 }
-QMainWindow, QMenuBar, QMenu, QDialog {
-    background: #10131a;
+QMenuBar, QMenu, QDialog {
+    color: #e8edf6;
+    background: #0d1219;
 }
-QPushButton, QLineEdit, QSpinBox, QComboBox {
-    min-height: 36px;
-    border: 1px solid #3b4352;
+QWidget#mainWindowSurface {
+    background: #080b10;
+}
+QFrame#sidebar {
+    background: #0e141c;
+    border: 1px solid #1c2633;
+    border-radius: 16px;
+}
+QFrame#contentArea {
+    background: #0a0e14;
+    border: 1px solid #151d28;
+    border-radius: 16px;
+}
+QFrame#card {
+    background: #111720;
+    border: 1px solid #202b39;
+    border-radius: 14px;
+}
+QLabel#cardTitle {
+    color: #f1f5fb;
+    font-size: 13px;
+    font-weight: 600;
+}
+QLabel#applicationTitle {
+    color: #f1f5fb;
+    font-size: 22px;
+    font-weight: 600;
+}
+QLabel#sectionLabel {
+    color: #6f7c90;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+QLabel#selectedDeviceName, QLabel#emptyStateTitle {
+    color: #f1f5fb;
+    font-size: 20px;
+    font-weight: 600;
+}
+QLabel#selectedDeviceDetails, QLabel#selectedDeviceDetails,
+QLabel#lastSeenLabel, QLabel#connectionStatusLabel {
+    color: #7e8b9e;
+}
+QLabel#localOnlyBadge, QLabel#connectionBadge {
+    padding: 5px 8px;
     border-radius: 8px;
-    padding: 0 10px;
-    background: #202631;
-}
-QPushButton:hover { background: #293446; }
-QPushButton:disabled { color: #707887; background: #1b2029; }
-QPushButton:focus, QLineEdit:focus, QListView:focus, QTabBar::tab:focus {
-    border: 2px solid #79a4ff;
-}
-QListView { border: 0; background: transparent; }
-QListView::item { min-height: 56px; padding: 8px; border-radius: 8px; }
-QListView::item:selected { background: #293e67; color: #ffffff; }
-QTabWidget::pane { border: 0; }
-QTabBar::tab { min-height: 36px; padding: 0 12px; }
-#applicationTitle { font-size: 22px; font-weight: 600; }
-#localOnlyBadge, #connectionBadge {
-    padding: 4px 8px;
-    border-radius: 8px;
-    background: #18392a;
+    background: #153323;
     color: #8ce3b3;
 }
-#connectionBadge[online="false"] {
-    background: #292f3a;
-    color: #a7afbd;
+QLabel#connectionBadge[online="false"] {
+    background: #202733;
+    color: #9ba7b8;
 }
-#emptyStateTitle, #selectedDeviceName { font-size: 20px; font-weight: 600; }
+QPushButton, QLineEdit, QSpinBox, QComboBox {
+    min-height: 34px;
+    color: #e8edf6;
+    border: 1px solid #303b4c;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #171e29;
+}
+QPushButton:hover, QComboBox:hover, QLineEdit:hover, QSpinBox:hover {
+    background: #1e2938;
+    border-color: #40516a;
+}
+QPushButton:pressed {
+    background: #24344b;
+}
+QPushButton:disabled, QSlider:disabled {
+    color: #667184;
+}
+QPushButton:focus, QLineEdit:focus, QListView:focus, QComboBox:focus,
+QSpinBox:focus {
+    border: 1px solid #5b8cff;
+}
+QPushButton#navigationButton {
+    min-height: 38px;
+    text-align: left;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #9ca8b8;
+}
+QPushButton#navigationButton:hover {
+    color: #e8edf6;
+    background: #151e2a;
+}
+QPushButton#navigationButton:checked {
+    color: #ffffff;
+    background: #1b3560;
+    border-color: #2a5798;
+}
+QPushButton#powerToggle {
+    min-width: 104px;
+    background: #192331;
+    border-color: #344357;
+}
+QPushButton#powerToggle:checked {
+    background: #173c2b;
+    border-color: #2a8c5c;
+    color: #a4edc4;
+}
+QListView {
+    border: 0;
+    background: transparent;
+}
+QListView::item {
+    min-height: 56px;
+    padding: 8px;
+    border-radius: 8px;
+}
+QListView::item:selected {
+    background: #1b3560;
+    color: #ffffff;
+}
+QSlider::groove:horizontal {
+    height: 5px;
+    border-radius: 2px;
+    background: #293341;
+}
+QSlider::handle:horizontal {
+    width: 16px;
+    margin: -6px 0;
+    border-radius: 8px;
+    background: #4d83ff;
+    border: 2px solid #bcd0ff;
+}
+QSlider::sub-page:horizontal {
+    border-radius: 2px;
+    background: #3b72ef;
+}
+QSlider#dashboardTemperatureSlider::groove:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #e87943, stop:0.5 #f2c84b, stop:1 #a8c7ff);
+}
+QSlider#dashboardTemperatureSlider::sub-page:horizontal {
+    background: transparent;
+}
+QComboBox::drop-down {
+    border: 0;
+    width: 24px;
+}
+QComboBox QAbstractItemView {
+    color: #e8edf6;
+    background: #171e29;
+    selection-background-color: #1b3560;
+}
+QAbstractItemView, QTableView, QListWidget, QPlainTextEdit {
+    background: #111720;
+    border: 1px solid #202b39;
+}
 #validationErrorLabel { color: #ff9aa7; }

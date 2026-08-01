@@ -3,5 +3,14 @@
         <file alias="dark.qss">styles/dark.qss</file>
         <file alias="light.qss">styles/light.qss</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file alias="dashboard.svg">icons/dashboard.svg</file>
+        <file alias="color.svg">icons/color.svg</file>
+        <file alias="effects.svg">icons/effects.svg</file>
+        <file alias="automations.svg">icons/automations.svg</file>
+        <file alias="device.svg">icons/device.svg</file>
+        <file alias="logs.svg">icons/logs.svg</file>
+        <file alias="power.svg">icons/power.svg</file>
+    </qresource>
 </RCC>
 

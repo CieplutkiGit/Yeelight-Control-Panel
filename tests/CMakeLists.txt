@@ -56,6 +56,8 @@ add_executable(test_ui_smoke
     ../src/ui/widgets/SegmentPreviewWidget.h
     ../src/ui/widgets/ConnectionBadge.cpp
     ../src/ui/widgets/ConnectionBadge.h
+    ../src/ui/widgets/CardWidget.cpp
+    ../src/ui/widgets/CardWidget.h
     ../src/ui/widgets/DeviceListDelegate.cpp
     ../src/ui/widgets/DeviceListDelegate.h
     ../src/ui/widgets/EffectTimelineWidget.cpp

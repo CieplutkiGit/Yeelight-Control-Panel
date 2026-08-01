@@ -17,9 +17,9 @@ class DeviceListModel;
 class QLabel;
 class QListView;
 class QPushButton;
+class QButtonGroup;
 class QSortFilterProxyModel;
 class QStackedWidget;
-class QTabWidget;
 class QSplitter;
 
 class MainWindow final : public QMainWindow {
@@ -61,7 +61,7 @@ private:
     QPushButton* powerOffButton_;
     QPushButton* favoriteButton_;
     QStackedWidget* contentStack_;
-    QTabWidget* tabs_;
+    QButtonGroup* navigationGroup_;
     QSplitter* splitter_;
     DashboardPage* dashboardPage_;
     ColorPage* colorPage_;
