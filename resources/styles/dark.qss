@@ -1,37 +1,232 @@
-QWidget {
-    color: #e8ecf4;
-    background: #151922;
+QMainWindow {
+    color: #e8edf6;
+    background: #080b10;
 }
-QMainWindow, QMenuBar, QMenu, QDialog {
-    background: #10131a;
+
+QMenuBar, QMenu, QDialog {
+    color: #e8edf6;
+    background: #0d1219;
 }
-QPushButton, QLineEdit, QSpinBox, QComboBox {
-    min-height: 36px;
-    border: 1px solid #3b4352;
+
+QWidget#mainWindowSurface {
+    background: #080b10;
+}
+
+QFrame#sidebar {
+    background: #101720;
+    border: 1px solid #202b39;
+    border-radius: 16px;
+}
+
+QFrame#contentArea {
+    background: #0c1118;
+    border: 1px solid #1c2633;
+    border-radius: 16px;
+}
+
+QFrame#card {
+    background: #151c25;
+    border: 1px solid #293544;
+    border-radius: 12px;
+}
+
+QFrame#navigationBar {
+    background: transparent;
+    border-bottom: 1px solid #293544;
+}
+
+QWidget#dashboardPage, QStackedWidget {
+    background: transparent;
+}
+
+QLabel#applicationTitle {
+    color: #f1f5fb;
+    font-size: 23px;
+    font-weight: 600;
+}
+
+QLabel#cardTitle {
+    color: #f1f5fb;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+QLabel#cardIcon {
+    background: transparent;
+}
+
+QLabel#sectionLabel {
+    color: #7d899c;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+QLabel#selectedDeviceName, QLabel#emptyStateTitle {
+    color: #f1f5fb;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+QLabel#selectedDeviceDetails, QLabel#lastSeenLabel,
+QLabel#connectionStatusLabel, QLabel#powerStateLabel,
+QLabel#brightnessValueLabel, QLabel#colorValueLabel,
+QLabel#temperatureValueLabel {
+    color: #9aa8bb;
+}
+
+QLabel#deviceIcon {
+    background: #18212c;
+    border: 1px solid #334154;
+    border-radius: 48px;
+}
+
+QLabel#localOnlyBadge, QLabel#connectionBadge {
+    padding: 5px 8px;
     border-radius: 8px;
-    padding: 0 10px;
-    background: #202631;
-}
-QPushButton:hover { background: #293446; }
-QPushButton:disabled { color: #707887; background: #1b2029; }
-QPushButton:focus, QLineEdit:focus, QListView:focus, QTabBar::tab:focus {
-    border: 2px solid #79a4ff;
-}
-QListView { border: 0; background: transparent; }
-QListView::item { min-height: 56px; padding: 8px; border-radius: 8px; }
-QListView::item:selected { background: #293e67; color: #ffffff; }
-QTabWidget::pane { border: 0; }
-QTabBar::tab { min-height: 36px; padding: 0 12px; }
-#applicationTitle { font-size: 22px; font-weight: 600; }
-#localOnlyBadge, #connectionBadge {
-    padding: 4px 8px;
-    border-radius: 8px;
-    background: #18392a;
+    background: #173b2b;
     color: #8ce3b3;
 }
-#connectionBadge[online="false"] {
-    background: #292f3a;
-    color: #a7afbd;
+
+QLabel#connectionBadge[online="false"] {
+    background: #202733;
+    color: #9ba7b8;
 }
-#emptyStateTitle, #selectedDeviceName { font-size: 20px; font-weight: 600; }
+
+QPushButton, QLineEdit, QSpinBox, QComboBox {
+    min-height: 34px;
+    color: #e8edf6;
+    border: 1px solid #303c4d;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #18212c;
+}
+
+QPushButton:hover, QComboBox:hover, QLineEdit:hover, QSpinBox:hover {
+    background: #202b39;
+    border-color: #4c5d74;
+}
+
+QPushButton:pressed {
+    background: #293a53;
+}
+
+QPushButton:disabled, QSlider:disabled {
+    color: #667184;
+}
+
+QPushButton:focus, QLineEdit:focus, QListView:focus,
+QComboBox:focus, QSpinBox:focus {
+    border: 1px solid #9b66f4;
+}
+
+QPushButton#navigationButton {
+    min-height: 48px;
+    border: 1px solid transparent;
+    border-radius: 8px 8px 0 0;
+    background: transparent;
+    color: #9aa8bb;
+    font-size: 14px;
+}
+
+QPushButton#navigationButton:hover {
+    color: #f1f5fb;
+    background: #18212c;
+}
+
+QPushButton#navigationButton:checked {
+    color: #bf91ff;
+    background: #211b35;
+    border-bottom: 2px solid #a26cf5;
+}
+
+QPushButton#favoriteButton {
+    min-width: 48px;
+    font-size: 20px;
+}
+
+QPushButton#powerToggle {
+    min-width: 66px;
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+QListView#deviceListView {
+    border: 0;
+    background: transparent;
+    outline: 0;
+}
+
+QSlider::groove:horizontal {
+    height: 6px;
+    border-radius: 3px;
+    background: #2b3544;
+}
+
+QSlider::handle:horizontal {
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    border-radius: 9px;
+    background: #f7f4ff;
+    border: 2px solid #d8c9ff;
+}
+
+QSlider::sub-page:horizontal {
+    border-radius: 3px;
+    background: #a26cf5;
+}
+
+QSlider::groove:vertical {
+    width: 6px;
+    border-radius: 3px;
+    background: #2b3544;
+}
+
+QSlider::handle:vertical {
+    width: 18px;
+    height: 18px;
+    margin: 0 -6px;
+    border-radius: 9px;
+    background: #f7f4ff;
+    border: 2px solid #d8c9ff;
+}
+
+QSlider::sub-page:vertical {
+    border-radius: 3px;
+    background: #a26cf5;
+}
+
+QSlider#dashboardTemperatureSlider::groove:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #ee944b, stop:0.5 #f4d28a, stop:1 #a9c9f8);
+}
+
+QSlider#dashboardTemperatureSlider::sub-page:horizontal {
+    background: transparent;
+}
+
+QComboBox::drop-down {
+    border: 0;
+    width: 24px;
+}
+
+QComboBox QAbstractItemView {
+    color: #e8edf6;
+    background: #18212c;
+    selection-background-color: #35255b;
+}
+
+QAbstractItemView, QTableView, QListWidget, QPlainTextEdit {
+    background: #151c25;
+    border: 1px solid #293544;
+}
+
+QStatusBar {
+    color: #9aa8bb;
+    background: #0d1219;
+}
+
 #validationErrorLabel { color: #ff9aa7; }

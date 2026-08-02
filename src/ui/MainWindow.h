@@ -17,10 +17,11 @@ class DeviceListModel;
 class QLabel;
 class QListView;
 class QPushButton;
+class QButtonGroup;
 class QSortFilterProxyModel;
 class QStackedWidget;
-class QTabWidget;
 class QSplitter;
+class PowerToggle;
 
 class MainWindow final : public QMainWindow {
     Q_OBJECT
@@ -57,11 +58,10 @@ private:
     QLabel* selectedNameLabel_;
     QLabel* selectedDetailsLabel_;
     ConnectionBadge* connectionBadge_;
-    QPushButton* powerOnButton_;
-    QPushButton* powerOffButton_;
+    PowerToggle* powerToggle_;
     QPushButton* favoriteButton_;
     QStackedWidget* contentStack_;
-    QTabWidget* tabs_;
+    QButtonGroup* navigationGroup_;
     QSplitter* splitter_;
     DashboardPage* dashboardPage_;
     ColorPage* colorPage_;

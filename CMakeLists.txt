@@ -87,6 +87,10 @@ add_executable(YeelightControlPanel
     src/ui/widgets/SegmentPreviewWidget.h
     src/ui/widgets/ConnectionBadge.cpp
     src/ui/widgets/ConnectionBadge.h
+    src/ui/widgets/CardWidget.cpp
+    src/ui/widgets/CardWidget.h
+    src/ui/widgets/PowerToggle.cpp
+    src/ui/widgets/PowerToggle.h
     src/ui/widgets/DeviceListDelegate.cpp
     src/ui/widgets/DeviceListDelegate.h
     src/ui/widgets/EffectTimelineWidget.cpp

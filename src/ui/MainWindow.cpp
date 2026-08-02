@@ -8,13 +8,18 @@
 #include "pages/AutomationsPage.h"
 #include "pages/DevicePage.h"
 #include "pages/LogsPage.h"
+#include "widgets/CardWidget.h"
 #include "widgets/ConnectionBadge.h"
 #include "widgets/DeviceListDelegate.h"
+#include "widgets/PowerToggle.h"
 
 #include <QAction>
+#include <QButtonGroup>
 #include <QCloseEvent>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QHostAddress>
+#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListView>
@@ -27,7 +32,7 @@
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
-#include <QTabWidget>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 MainWindow::MainWindow(
@@ -46,11 +51,10 @@ MainWindow::MainWindow(
     , selectedNameLabel_(new QLabel(tr("No device selected"), this))
     , selectedDetailsLabel_(new QLabel(this))
     , connectionBadge_(new ConnectionBadge(this))
-    , powerOnButton_(new QPushButton(tr("On"), this))
-    , powerOffButton_(new QPushButton(tr("Off"), this))
+    , powerToggle_(new PowerToggle(this))
     , favoriteButton_(new QPushButton(tr("Favorite"), this))
     , contentStack_(new QStackedWidget(this))
-    , tabs_(new QTabWidget(this))
+    , navigationGroup_(new QButtonGroup(this))
     , splitter_(new QSplitter(Qt::Horizontal, this))
     , dashboardPage_(new DashboardPage(this))
     , colorPage_(new ColorPage(settings, this))
@@ -59,22 +63,29 @@ MainWindow::MainWindow(
     , devicePage_(new DevicePage(manager, this))
     , logsPage_(new LogsPage(settings, this)) {
     setWindowTitle(tr("Yeelight LAN"));
-    resize(1180, 760);
+    resize(1448, 980);
     setMinimumSize(900, 600);
 
     auto* central = new QWidget(this);
+    central->setObjectName(QStringLiteral("mainWindowSurface"));
     auto* outerLayout = new QHBoxLayout(central);
-    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setContentsMargins(4, 4, 4, 4);
+    outerLayout->setSpacing(10);
     splitter_->setChildrenCollapsible(false);
 
-    auto* sidebar = new QWidget(splitter_);
+    auto* sidebar = new QFrame(splitter_);
+    sidebar->setObjectName(QStringLiteral("sidebar"));
     sidebar->setMinimumWidth(240);
     sidebar->setMaximumWidth(360);
     auto* sidebarLayout = new QVBoxLayout(sidebar);
+    sidebarLayout->setContentsMargins(18, 24, 18, 18);
+    sidebarLayout->setSpacing(14);
     auto* title = new QLabel(tr("Yeelight LAN"), sidebar);
     title->setObjectName(QStringLiteral("applicationTitle"));
-    auto* localBadge = new QLabel(tr("Local network only"), sidebar);
+    auto* localCard = new CardWidget({}, sidebar);
+    auto* localBadge = new QLabel(tr("Local network only"), localCard);
     localBadge->setObjectName(QStringLiteral("localOnlyBadge"));
+    localCard->contentLayout()->addWidget(localBadge);
     auto* search = new QLineEdit(sidebar);
     search->setObjectName(QStringLiteral("deviceSearchEdit"));
     search->setPlaceholderText(tr("Search devices"));
@@ -89,9 +100,10 @@ MainWindow::MainWindow(
     buttonRow->addWidget(discoverButton);
     buttonRow->addWidget(addButton);
     sidebarLayout->addWidget(title);
-    sidebarLayout->addWidget(localBadge);
+    sidebarLayout->addWidget(localCard);
     sidebarLayout->addWidget(search);
     sidebarLayout->addWidget(deviceListView_, 1);
+    sidebarLayout->addStretch(1);
     sidebarLayout->addLayout(buttonRow);
     sidebarLayout->addWidget(statusLabel_);
 
@@ -100,27 +112,66 @@ MainWindow::MainWindow(
     proxyModel_->setFilterRole(Qt::DisplayRole);
     deviceListView_->setModel(proxyModel_);
 
-    auto* mainContent = new QWidget(splitter_);
+    auto* mainContent = new QFrame(splitter_);
+    mainContent->setObjectName(QStringLiteral("contentArea"));
     auto* mainLayout = new QVBoxLayout(mainContent);
-    auto* header = new QWidget(mainContent);
-    auto* headerLayout = new QHBoxLayout(header);
+    mainLayout->setContentsMargins(10, 10, 10, 10);
+    mainLayout->setSpacing(0);
+    auto* header = new CardWidget({}, mainContent);
+    auto* headerRow = new QHBoxLayout;
+    auto* deviceIcon = new QLabel(header);
+    deviceIcon->setObjectName(QStringLiteral("deviceIcon"));
+    deviceIcon->setFixedSize(96, 96);
+    deviceIcon->setAlignment(Qt::AlignCenter);
+    deviceIcon->setPixmap(QIcon(QStringLiteral(":/icons/bulb.svg")).pixmap(64, 64));
+    headerRow->addWidget(deviceIcon);
+    headerRow->addSpacing(10);
     auto* identityLayout = new QVBoxLayout;
     selectedNameLabel_->setObjectName(QStringLiteral("selectedDeviceName"));
     selectedDetailsLabel_->setObjectName(QStringLiteral("selectedDeviceDetails"));
     identityLayout->addWidget(selectedNameLabel_);
     identityLayout->addWidget(selectedDetailsLabel_);
-    headerLayout->addLayout(identityLayout, 1);
-    headerLayout->addWidget(connectionBadge_);
+    headerRow->addLayout(identityLayout, 1);
+    headerRow->addWidget(connectionBadge_);
     favoriteButton_->setCheckable(true);
-    headerLayout->addWidget(favoriteButton_);
+    headerRow->addWidget(favoriteButton_);
     auto* reconnectButton = new QPushButton(tr("Reconnect"), header);
-    headerLayout->addWidget(reconnectButton);
-    headerLayout->addWidget(powerOnButton_);
-    headerLayout->addWidget(powerOffButton_);
+    reconnectButton->setObjectName(QStringLiteral("reconnectButton"));
+    headerRow->addWidget(reconnectButton);
+    headerRow->addWidget(powerToggle_);
+    header->contentLayout()->addLayout(headerRow);
     mainLayout->addWidget(header);
 
-    auto* emptyPage = new QWidget(contentStack_);
-    auto* emptyLayout = new QVBoxLayout(emptyPage);
+    auto* navigationBar = new QFrame(mainContent);
+    navigationBar->setObjectName(QStringLiteral("navigationBar"));
+    auto* navigationLayout = new QHBoxLayout(navigationBar);
+    navigationLayout->setContentsMargins(8, 8, 8, 0);
+    navigationLayout->setSpacing(8);
+    navigationGroup_->setExclusive(true);
+    const QList<QPair<QString, QString>> navigationItems{
+        {tr("Dashboard"), QStringLiteral(":/icons/dashboard.svg")},
+        {tr("Color"), QStringLiteral(":/icons/color.svg")},
+        {tr("Effects"), QStringLiteral(":/icons/effects.svg")},
+        {tr("Automations"), QStringLiteral(":/icons/automations.svg")},
+        {tr("Device"), QStringLiteral(":/icons/device.svg")},
+        {tr("Logs"), QStringLiteral(":/icons/logs.svg")}
+    };
+    for (int index = 0; index < navigationItems.size(); ++index) {
+        auto* button = new QPushButton(navigationItems.at(index).first, navigationBar);
+        button->setObjectName(QStringLiteral("navigationButton"));
+        button->setCheckable(true);
+        button->setIcon(QIcon(navigationItems.at(index).second));
+        button->setIconSize(QSize(20, 20));
+        navigationGroup_->addButton(button, index);
+        navigationLayout->addWidget(button, 1);
+        if (index == 0) {
+            button->setChecked(true);
+        }
+    }
+    mainLayout->addWidget(navigationBar);
+
+    auto* emptyPage = new CardWidget({}, contentStack_);
+    auto* emptyLayout = emptyPage->contentLayout();
     auto* emptyTitle = new QLabel(tr("No Yeelight LAN devices found"), emptyPage);
     emptyTitle->setObjectName(QStringLiteral("emptyStateTitle"));
     auto* instructions = new QLabel(
@@ -143,14 +194,13 @@ MainWindow::MainWindow(
     emptyLayout->addLayout(emptyButtons);
     emptyLayout->addStretch();
 
-    tabs_->addTab(dashboardPage_, tr("Dashboard"));
-    tabs_->addTab(colorPage_, tr("Color"));
-    tabs_->addTab(effectsPage_, tr("Effects"));
-    tabs_->addTab(automationsPage_, tr("Automations"));
-    tabs_->addTab(devicePage_, tr("Device"));
-    tabs_->addTab(logsPage_, tr("Logs"));
     contentStack_->addWidget(emptyPage);
-    contentStack_->addWidget(tabs_);
+    contentStack_->addWidget(dashboardPage_);
+    contentStack_->addWidget(colorPage_);
+    contentStack_->addWidget(effectsPage_);
+    contentStack_->addWidget(automationsPage_);
+    contentStack_->addWidget(devicePage_);
+    contentStack_->addWidget(logsPage_);
     mainLayout->addWidget(contentStack_, 1);
 
     splitter_->addWidget(sidebar);
@@ -163,6 +213,10 @@ MainWindow::MainWindow(
     }
     outerLayout->addWidget(splitter_);
     setCentralWidget(central);
+
+    connect(navigationGroup_, &QButtonGroup::idClicked, this, [this](int id) {
+        contentStack_->setCurrentIndex(id + 1);
+    });
 
     auto* viewMenu = menuBar()->addMenu(tr("&View"));
     auto* themeMenu = viewMenu->addMenu(tr("Theme"));
@@ -205,14 +259,9 @@ MainWindow::MainWindow(
             selectedDevice_->connectDevice();
         }
     });
-    connect(powerOnButton_, &QPushButton::clicked, this, [this] {
+    connect(powerToggle_, &QAbstractButton::toggled, this, [this](bool on) {
         if (selectedDevice_ != nullptr) {
-            selectedDevice_->setPower(true);
-        }
-    });
-    connect(powerOffButton_, &QPushButton::clicked, this, [this] {
-        if (selectedDevice_ != nullptr) {
-            selectedDevice_->setPower(false);
+            selectedDevice_->setPower(on);
         }
     });
     connect(favoriteButton_, &QPushButton::clicked, this, [this](bool favorite) {
@@ -289,13 +338,16 @@ void MainWindow::updateSelection(DeviceController* controller) {
     logsPage_->setDevice(selectedDevice_);
     const bool selected = selectedDevice_ != nullptr;
     contentStack_->setCurrentIndex(selected ? 1 : 0);
-    powerOnButton_->setEnabled(selected);
-    powerOffButton_->setEnabled(selected);
+    for (auto* button : navigationGroup_->buttons()) {
+        button->setEnabled(selected);
+    }
+    powerToggle_->setEnabled(selected);
     favoriteButton_->setEnabled(selected && settings_ != nullptr);
     if (!selected) {
         selectedNameLabel_->setText(tr("No device selected"));
         selectedDetailsLabel_->clear();
         connectionBadge_->setOnline(false);
+        powerToggle_->setChecked(false);
         favoriteButton_->setChecked(false);
         return;
     }
@@ -310,13 +362,14 @@ void MainWindow::updateSelection(DeviceController* controller) {
             QStringLiteral("%1 · %2").arg(info.model, info.ipAddress)
         );
         connectionBadge_->setOnline(state.reachable);
+        const QSignalBlocker powerBlocker(powerToggle_);
+        powerToggle_->setChecked(state.power == PowerState::On);
         favoriteButton_->setChecked(
             settings_ != nullptr
                 && settings_->value(QStringLiteral("devices/favorites"))
                     .toStringList().contains(info.stableId())
         );
-        powerOnButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
-        powerOffButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
+        powerToggle_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
     };
     connect(selectedDevice_, &DeviceController::infoChanged, this, refreshHeader);
     connect(selectedDevice_, &DeviceController::stateChanged, this, refreshHeader);
