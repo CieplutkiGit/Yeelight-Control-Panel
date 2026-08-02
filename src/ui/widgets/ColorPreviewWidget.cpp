@@ -51,12 +51,12 @@ void ColorPreviewWidget::paintEvent(QPaintEvent* event) {
     painter.setBrush(wheel);
     painter.drawEllipse(center, radius, radius);
 
-    qreal hue = 0.0;
-    qreal saturation = 0.0;
-    qreal value = 1.0;
+    float hue = 0.0F;
+    float saturation = 0.0F;
+    float value = 1.0F;
     color_.getHsvF(&hue, &saturation, &value);
-    if (hue < 0.0) {
-        hue = 0.08;
+    if (hue < 0.0F) {
+        hue = 0.08F;
     }
     const qreal angle = (hue * 360.0 - 90.0) * 3.141592653589793 / 180.0;
     const QPointF marker = center + QPointF(
