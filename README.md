@@ -7,6 +7,12 @@ control, a web server, or an automatic updater.
 
 > Current version: **2.0.0**
 
+## Current UI
+
+![Current Yeelight LAN UI](docs/screenshots/current-ui.png)
+
+current UI kinda mid but works
+
 ## Features
 
 - asynchronous multicast discovery across active IPv4 adapters
