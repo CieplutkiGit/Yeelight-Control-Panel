@@ -11,6 +11,10 @@
         <file alias="device.svg">icons/device.svg</file>
         <file alias="logs.svg">icons/logs.svg</file>
         <file alias="power.svg">icons/power.svg</file>
+        <file alias="brightness.svg">icons/brightness.svg</file>
+        <file alias="temperature.svg">icons/temperature.svg</file>
+        <file alias="timer.svg">icons/timer.svg</file>
+        <file alias="bulb.svg">icons/bulb.svg</file>
     </qresource>
 </RCC>
 

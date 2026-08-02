@@ -19,6 +19,25 @@ QFrame#contentArea {
     border: 1px solid #dfe6f0;
     border-radius: 16px;
 }
+QFrame#navigationBar {
+    background: transparent;
+    border-bottom: 1px solid #dce3ee;
+}
+QWidget#dashboardPage, QStackedWidget {
+    background: transparent;
+}
+QLabel#deviceIcon {
+    background: #f0f3f8;
+    border: 1px solid #c9d3e1;
+    border-radius: 48px;
+}
+QPushButton#powerToggle {
+    min-width: 66px;
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
 QFrame#card {
     background: #ffffff;
     border: 1px solid #dce3ee;

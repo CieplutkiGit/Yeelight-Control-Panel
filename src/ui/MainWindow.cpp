@@ -11,6 +11,7 @@
 #include "widgets/CardWidget.h"
 #include "widgets/ConnectionBadge.h"
 #include "widgets/DeviceListDelegate.h"
+#include "widgets/PowerToggle.h"
 
 #include <QAction>
 #include <QButtonGroup>
@@ -31,6 +32,7 @@
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 MainWindow::MainWindow(
@@ -49,8 +51,7 @@ MainWindow::MainWindow(
     , selectedNameLabel_(new QLabel(tr("No device selected"), this))
     , selectedDetailsLabel_(new QLabel(this))
     , connectionBadge_(new ConnectionBadge(this))
-    , powerOnButton_(new QPushButton(tr("On"), this))
-    , powerOffButton_(new QPushButton(tr("Off"), this))
+    , powerToggle_(new PowerToggle(this))
     , favoriteButton_(new QPushButton(tr("Favorite"), this))
     , contentStack_(new QStackedWidget(this))
     , navigationGroup_(new QButtonGroup(this))
@@ -62,14 +63,14 @@ MainWindow::MainWindow(
     , devicePage_(new DevicePage(manager, this))
     , logsPage_(new LogsPage(settings, this)) {
     setWindowTitle(tr("Yeelight LAN"));
-    resize(1180, 760);
+    resize(1448, 980);
     setMinimumSize(900, 600);
 
     auto* central = new QWidget(this);
     central->setObjectName(QStringLiteral("mainWindowSurface"));
     auto* outerLayout = new QHBoxLayout(central);
-    outerLayout->setContentsMargins(14, 14, 14, 14);
-    outerLayout->setSpacing(14);
+    outerLayout->setContentsMargins(4, 4, 4, 4);
+    outerLayout->setSpacing(10);
     splitter_->setChildrenCollapsible(false);
 
     auto* sidebar = new QFrame(splitter_);
@@ -77,11 +78,11 @@ MainWindow::MainWindow(
     sidebar->setMinimumWidth(240);
     sidebar->setMaximumWidth(360);
     auto* sidebarLayout = new QVBoxLayout(sidebar);
-    sidebarLayout->setContentsMargins(18, 18, 18, 18);
-    sidebarLayout->setSpacing(12);
+    sidebarLayout->setContentsMargins(18, 24, 18, 18);
+    sidebarLayout->setSpacing(14);
     auto* title = new QLabel(tr("Yeelight LAN"), sidebar);
     title->setObjectName(QStringLiteral("applicationTitle"));
-    auto* localCard = new CardWidget(tr("Local network"), sidebar);
+    auto* localCard = new CardWidget({}, sidebar);
     auto* localBadge = new QLabel(tr("Local network only"), localCard);
     localBadge->setObjectName(QStringLiteral("localOnlyBadge"));
     localCard->contentLayout()->addWidget(localBadge);
@@ -98,38 +99,12 @@ MainWindow::MainWindow(
     auto* buttonRow = new QHBoxLayout;
     buttonRow->addWidget(discoverButton);
     buttonRow->addWidget(addButton);
-    auto* navigationTitle = new QLabel(tr("CONTROL"), sidebar);
-    navigationTitle->setObjectName(QStringLiteral("sectionLabel"));
-    auto* navigationLayout = new QVBoxLayout;
-    navigationLayout->setSpacing(4);
-    navigationGroup_->setExclusive(true);
-    const QList<QPair<QString, QString>> navigationItems{
-        {tr("Dashboard"), QStringLiteral(":/icons/dashboard.svg")},
-        {tr("Color"), QStringLiteral(":/icons/color.svg")},
-        {tr("Effects"), QStringLiteral(":/icons/effects.svg")},
-        {tr("Automations"), QStringLiteral(":/icons/automations.svg")},
-        {tr("Device"), QStringLiteral(":/icons/device.svg")},
-        {tr("Logs"), QStringLiteral(":/icons/logs.svg")}
-    };
-    for (int index = 0; index < navigationItems.size(); ++index) {
-        auto* button = new QPushButton(navigationItems.at(index).first, sidebar);
-        button->setObjectName(QStringLiteral("navigationButton"));
-        button->setCheckable(true);
-        button->setIcon(QIcon(navigationItems.at(index).second));
-        button->setIconSize(QSize(18, 18));
-        navigationGroup_->addButton(button, index);
-        navigationLayout->addWidget(button);
-        if (index == 0) {
-            button->setChecked(true);
-        }
-    }
     sidebarLayout->addWidget(title);
     sidebarLayout->addWidget(localCard);
     sidebarLayout->addWidget(search);
     sidebarLayout->addWidget(deviceListView_, 1);
+    sidebarLayout->addStretch(1);
     sidebarLayout->addLayout(buttonRow);
-    sidebarLayout->addWidget(navigationTitle);
-    sidebarLayout->addLayout(navigationLayout);
     sidebarLayout->addWidget(statusLabel_);
 
     proxyModel_->setSourceModel(deviceModel_);
@@ -141,9 +116,16 @@ MainWindow::MainWindow(
     mainContent->setObjectName(QStringLiteral("contentArea"));
     auto* mainLayout = new QVBoxLayout(mainContent);
     mainLayout->setContentsMargins(10, 10, 10, 10);
-    mainLayout->setSpacing(14);
+    mainLayout->setSpacing(0);
     auto* header = new CardWidget({}, mainContent);
     auto* headerRow = new QHBoxLayout;
+    auto* deviceIcon = new QLabel(header);
+    deviceIcon->setObjectName(QStringLiteral("deviceIcon"));
+    deviceIcon->setFixedSize(96, 96);
+    deviceIcon->setAlignment(Qt::AlignCenter);
+    deviceIcon->setPixmap(QIcon(QStringLiteral(":/icons/bulb.svg")).pixmap(64, 64));
+    headerRow->addWidget(deviceIcon);
+    headerRow->addSpacing(10);
     auto* identityLayout = new QVBoxLayout;
     selectedNameLabel_->setObjectName(QStringLiteral("selectedDeviceName"));
     selectedDetailsLabel_->setObjectName(QStringLiteral("selectedDeviceDetails"));
@@ -154,11 +136,39 @@ MainWindow::MainWindow(
     favoriteButton_->setCheckable(true);
     headerRow->addWidget(favoriteButton_);
     auto* reconnectButton = new QPushButton(tr("Reconnect"), header);
+    reconnectButton->setObjectName(QStringLiteral("reconnectButton"));
     headerRow->addWidget(reconnectButton);
-    headerRow->addWidget(powerOnButton_);
-    headerRow->addWidget(powerOffButton_);
+    headerRow->addWidget(powerToggle_);
     header->contentLayout()->addLayout(headerRow);
     mainLayout->addWidget(header);
+
+    auto* navigationBar = new QFrame(mainContent);
+    navigationBar->setObjectName(QStringLiteral("navigationBar"));
+    auto* navigationLayout = new QHBoxLayout(navigationBar);
+    navigationLayout->setContentsMargins(8, 8, 8, 0);
+    navigationLayout->setSpacing(8);
+    navigationGroup_->setExclusive(true);
+    const QList<QPair<QString, QString>> navigationItems{
+        {tr("Dashboard"), QStringLiteral(":/icons/dashboard.svg")},
+        {tr("Color"), QStringLiteral(":/icons/color.svg")},
+        {tr("Effects"), QStringLiteral(":/icons/effects.svg")},
+        {tr("Automations"), QStringLiteral(":/icons/automations.svg")},
+        {tr("Device"), QStringLiteral(":/icons/device.svg")},
+        {tr("Logs"), QStringLiteral(":/icons/logs.svg")}
+    };
+    for (int index = 0; index < navigationItems.size(); ++index) {
+        auto* button = new QPushButton(navigationItems.at(index).first, navigationBar);
+        button->setObjectName(QStringLiteral("navigationButton"));
+        button->setCheckable(true);
+        button->setIcon(QIcon(navigationItems.at(index).second));
+        button->setIconSize(QSize(20, 20));
+        navigationGroup_->addButton(button, index);
+        navigationLayout->addWidget(button, 1);
+        if (index == 0) {
+            button->setChecked(true);
+        }
+    }
+    mainLayout->addWidget(navigationBar);
 
     auto* emptyPage = new CardWidget({}, contentStack_);
     auto* emptyLayout = emptyPage->contentLayout();
@@ -249,14 +259,9 @@ MainWindow::MainWindow(
             selectedDevice_->connectDevice();
         }
     });
-    connect(powerOnButton_, &QPushButton::clicked, this, [this] {
+    connect(powerToggle_, &QAbstractButton::toggled, this, [this](bool on) {
         if (selectedDevice_ != nullptr) {
-            selectedDevice_->setPower(true);
-        }
-    });
-    connect(powerOffButton_, &QPushButton::clicked, this, [this] {
-        if (selectedDevice_ != nullptr) {
-            selectedDevice_->setPower(false);
+            selectedDevice_->setPower(on);
         }
     });
     connect(favoriteButton_, &QPushButton::clicked, this, [this](bool favorite) {
@@ -336,13 +341,13 @@ void MainWindow::updateSelection(DeviceController* controller) {
     for (auto* button : navigationGroup_->buttons()) {
         button->setEnabled(selected);
     }
-    powerOnButton_->setEnabled(selected);
-    powerOffButton_->setEnabled(selected);
+    powerToggle_->setEnabled(selected);
     favoriteButton_->setEnabled(selected && settings_ != nullptr);
     if (!selected) {
         selectedNameLabel_->setText(tr("No device selected"));
         selectedDetailsLabel_->clear();
         connectionBadge_->setOnline(false);
+        powerToggle_->setChecked(false);
         favoriteButton_->setChecked(false);
         return;
     }
@@ -357,13 +362,14 @@ void MainWindow::updateSelection(DeviceController* controller) {
             QStringLiteral("%1 · %2").arg(info.model, info.ipAddress)
         );
         connectionBadge_->setOnline(state.reachable);
+        const QSignalBlocker powerBlocker(powerToggle_);
+        powerToggle_->setChecked(state.power == PowerState::On);
         favoriteButton_->setChecked(
             settings_ != nullptr
                 && settings_->value(QStringLiteral("devices/favorites"))
                     .toStringList().contains(info.stableId())
         );
-        powerOnButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
-        powerOffButton_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
+        powerToggle_->setEnabled(info.capabilities.supports(QStringLiteral("set_power")));
     };
     connect(selectedDevice_, &DeviceController::infoChanged, this, refreshHeader);
     connect(selectedDevice_, &DeviceController::stateChanged, this, refreshHeader);

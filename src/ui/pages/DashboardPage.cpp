@@ -2,6 +2,7 @@
 
 #include "../widgets/CardWidget.h"
 #include "../widgets/ColorPreviewWidget.h"
+#include "../widgets/PowerToggle.h"
 
 #include <QColorDialog>
 #include <QComboBox>
@@ -43,7 +44,7 @@ DashboardPage::DashboardPage(QWidget* parent)
     , colorPreview_(new ColorPreviewWidget(this))
     , brightnessSlider_(new QSlider(Qt::Horizontal, this))
     , temperatureSlider_(new QSlider(Qt::Horizontal, this))
-    , powerToggle_(new QPushButton(tr("Off"), this))
+    , powerToggle_(new PowerToggle(this))
     , transitionCombo_(new QComboBox(this))
     , refreshStateButton_(new QPushButton(tr("Refresh state"), this))
     , throttleTimer_(new QTimer(this)) {
@@ -56,9 +57,6 @@ DashboardPage::DashboardPage(QWidget* parent)
     temperatureSlider_->setObjectName(QStringLiteral("dashboardTemperatureSlider"));
     temperatureSlider_->setRange(1700, 6500);
     powerToggle_->setObjectName(QStringLiteral("powerToggle"));
-    powerToggle_->setCheckable(true);
-    powerToggle_->setIcon(QIcon(QStringLiteral(":/icons/power.svg")));
-    powerToggle_->setIconSize(QSize(18, 18));
     transitionCombo_->setObjectName(QStringLiteral("transitionCombo"));
     transitionCombo_->addItem(tr("0.3 s"), 300);
     transitionCombo_->addItem(tr("1.0 s"), 1000);
@@ -72,7 +70,9 @@ DashboardPage::DashboardPage(QWidget* parent)
     lastSeenLabel_->setObjectName(QStringLiteral("lastSeenLabel"));
     connectionStatusLabel_->setObjectName(QStringLiteral("connectionStatusLabel"));
 
-    auto* brightnessCard = new CardWidget(tr("Brightness"), this);
+    auto* brightnessCard = new CardWidget(
+        tr("Brightness"), QStringLiteral(":/icons/brightness.svg"), this
+    );
     auto* brightnessValueRow = new QHBoxLayout;
     brightnessValueRow->addWidget(new QLabel(tr("Level"), brightnessCard));
     brightnessValueRow->addStretch();
@@ -80,8 +80,12 @@ DashboardPage::DashboardPage(QWidget* parent)
     brightnessCard->contentLayout()->addLayout(brightnessValueRow);
     brightnessCard->contentLayout()->addWidget(brightnessSlider_);
 
-    auto* colorCard = new CardWidget(tr("Color"), this);
+    auto* colorCard = new CardWidget(
+        tr("Color"), QStringLiteral(":/icons/color.svg"), this
+    );
     auto* colorLayout = new QHBoxLayout;
+    colorPreview_->setMinimumSize(188, 188);
+    colorPreview_->setMaximumSize(220, 220);
     colorLayout->addWidget(colorPreview_, 0, Qt::AlignCenter);
     auto* colorDetails = new QVBoxLayout;
     colorDetails->addWidget(new QLabel(tr("Selected color"), colorCard));
@@ -90,7 +94,9 @@ DashboardPage::DashboardPage(QWidget* parent)
     colorLayout->addLayout(colorDetails, 1);
     colorCard->contentLayout()->addLayout(colorLayout);
 
-    auto* temperatureCard = new CardWidget(tr("Color temperature"), this);
+    auto* temperatureCard = new CardWidget(
+        tr("White temperature"), QStringLiteral(":/icons/temperature.svg"), this
+    );
     auto* temperatureValueRow = new QHBoxLayout;
     temperatureValueRow->addWidget(new QLabel(tr("Warm"), temperatureCard));
     temperatureValueRow->addStretch();
@@ -99,7 +105,9 @@ DashboardPage::DashboardPage(QWidget* parent)
     temperatureCard->contentLayout()->addLayout(temperatureValueRow);
     temperatureCard->contentLayout()->addWidget(temperatureSlider_);
 
-    auto* powerCard = new CardWidget(tr("Power"), this);
+    auto* powerCard = new CardWidget(
+        tr("Power"), QStringLiteral(":/icons/power.svg"), this
+    );
     auto* powerLayout = new QHBoxLayout;
     powerLayout->addWidget(powerToggle_);
     powerLayout->addStretch();
@@ -107,26 +115,27 @@ DashboardPage::DashboardPage(QWidget* parent)
     powerCard->contentLayout()->addLayout(powerLayout);
     powerCard->contentLayout()->addWidget(connectionStatusLabel_);
 
-    auto* transitionCard = new CardWidget(tr("Transition"), this);
+    auto* transitionCard = new CardWidget(
+        tr("Transition"), QStringLiteral(":/icons/timer.svg"), this
+    );
+    transitionCard->contentLayout()->addWidget(new QLabel(tr("Animation duration"), transitionCard));
     transitionCard->contentLayout()->addWidget(transitionCombo_);
+    transitionCard->contentLayout()->addWidget(refreshStateButton_);
 
     cards_ = {brightnessCard, colorCard, temperatureCard, powerCard, transitionCard};
-    for (auto* card : cards_) {
-        card->setMinimumHeight(132);
-    }
-
-    auto* footer = new QHBoxLayout;
-    footer->addWidget(new QLabel(tr("Last response"), this));
-    footer->addWidget(lastSeenLabel_);
-    footer->addStretch();
-    footer->addWidget(refreshStateButton_);
+    brightnessCard->setMinimumHeight(166);
+    colorCard->setMinimumHeight(350);
+    temperatureCard->setMinimumHeight(166);
+    powerCard->setMinimumHeight(132);
+    transitionCard->setMinimumHeight(132);
 
     grid_->setHorizontalSpacing(14);
     grid_->setVerticalSpacing(14);
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addLayout(grid_);
-    layout->addLayout(footer);
+    layout->addWidget(lastSeenLabel_);
+    lastSeenLabel_->setVisible(false);
     arrangeCards();
 
     throttleTimer_->setSingleShot(true);
@@ -136,7 +145,7 @@ DashboardPage::DashboardPage(QWidget* parent)
             device_->refreshState();
         }
     });
-    connect(powerToggle_, &QPushButton::clicked, this, [this](bool on) {
+    connect(powerToggle_, &QAbstractButton::toggled, this, [this](bool on) {
         if (device_ != nullptr) {
             device_->setPower(on);
         }
@@ -200,7 +209,7 @@ void DashboardPage::resizeEvent(QResizeEvent* event) {
 }
 
 void DashboardPage::arrangeCards() {
-    const int columns = width() >= 900 ? 3 : (width() >= 620 ? 2 : 1);
+    const int columns = width() >= 760 ? 2 : 1;
     if (columns == gridColumns_ && grid_->count() == cards_.size()) {
         return;
     }
@@ -208,11 +217,19 @@ void DashboardPage::arrangeCards() {
     while (grid_->count() > 0) {
         grid_->takeAt(0);
     }
-    for (int column = 0; column < 3; ++column) {
+    for (int column = 0; column < 2; ++column) {
         grid_->setColumnStretch(column, column < columns ? 1 : 0);
     }
-    for (int index = 0; index < cards_.size(); ++index) {
-        grid_->addWidget(cards_.at(index), index / columns, index % columns);
+    if (columns == 2) {
+        grid_->addWidget(cards_.at(0), 0, 0);
+        grid_->addWidget(cards_.at(1), 0, 1, 2, 1);
+        grid_->addWidget(cards_.at(2), 1, 0);
+        grid_->addWidget(cards_.at(3), 2, 0);
+        grid_->addWidget(cards_.at(4), 2, 1);
+    } else {
+        for (int index = 0; index < cards_.size(); ++index) {
+            grid_->addWidget(cards_.at(index), index, 0);
+        }
     }
 }
 
@@ -237,7 +254,6 @@ void DashboardPage::refresh() {
     const DeviceState state = device_->state();
     const QSignalBlocker powerBlocker(powerToggle_);
     powerToggle_->setChecked(state.power == PowerState::On);
-    powerToggle_->setText(powerText(state.power));
     powerStateLabel_->setText(powerText(state.power));
     connectionStatusLabel_->setText(state.reachable ? tr("Connected") : tr("Disconnected"));
     lastSeenLabel_->setText(

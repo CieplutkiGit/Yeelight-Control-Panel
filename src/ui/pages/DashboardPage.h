@@ -15,6 +15,7 @@ class QLabel;
 class QPushButton;
 class QSlider;
 class QTimer;
+class PowerToggle;
 
 class DashboardPage final : public QWidget {
     Q_OBJECT
@@ -47,7 +48,7 @@ private:
     ColorPreviewWidget* colorPreview_;
     QSlider* brightnessSlider_;
     QSlider* temperatureSlider_;
-    QPushButton* powerToggle_;
+    PowerToggle* powerToggle_;
     QComboBox* transitionCombo_;
     QPushButton* refreshStateButton_;
     QTimer* throttleTimer_;
